@@ -325,6 +325,11 @@ fn process_unit_enum(enum_name: Ident, data_enum: DataEnum) -> TokenStream {
                         Self([#first_component, #second_component, #third_component])
                     }
 
+                    /// Constructs an instance from an array.
+                    pub const fn from_array(vec: [T; 3]) -> Self {
+                        Self(vec)
+                    }
+
                     /// Gets the value of the first dimension.
                     #[doc = #x_doc]
                     pub fn x(&self) -> T where T: Clone {

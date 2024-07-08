@@ -12,7 +12,7 @@ rust-version.workspace = true
 readme = "../../README.md"
 
 [features]
-default = ["num-traits", "defmt"]
+default = []
 std = []
 num-traits = ["dep:num-traits"]
 defmt = ["dep:defmt"]

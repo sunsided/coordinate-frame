@@ -569,6 +569,12 @@ fn process_unit_enum(enum_name: Ident, data_enum: DataEnum) -> TokenStream {
                     }
                 }
 
+                impl<T> core::cmp::PartialEq<&[T; 3]> for #variant_name <T> where T: core::cmp::PartialEq<T> {
+                    fn eq(&self, other: &&[T; 3]) -> bool {
+                        self.0.eq(*other)
+                    }
+                }
+
                 #(#handedness_impl)*
                 #(#conversion_impl)*
             }

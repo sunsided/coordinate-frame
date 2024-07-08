@@ -2,7 +2,7 @@
 
 use proc_macro::TokenStream;
 use quote::{format_ident, quote, ToTokens};
-use syn::{parse_macro_input, Data, DataEnum, DeriveInput, Fields, Ident};
+use syn::{parse_macro_input, Data, DataEnum, DeriveInput, Fields, Ident, Lit};
 
 const LATERAL: [&str; 2] = ["east", "west"];
 const LONGITUDINAL: [&str; 2] = ["north", "south"];
@@ -23,8 +23,17 @@ pub fn derive_coordinate_frame(input: TokenStream) -> TokenStream {
 
 /// Processes an enum of which we assume it is unit, i.e. (all) variants have no embedded values.
 fn process_unit_enum(enum_name: Ident, data_enum: DataEnum) -> TokenStream {
+    let mut parse_u8_arms = Vec::new();
+
     let impls = data_enum.variants.iter().map(|variant| {
         let variant_name = &variant.ident;
+
+        let variant_value = variant.discriminant.as_ref().map(|(_, expr)| {
+            match expr {
+                syn::Expr::Lit(syn::ExprLit { lit: Lit::Int(lit_int), .. }) => lit_int.base10_parse::<u8>().unwrap(),
+                _ => panic!("Enum discriminant is not an integer literal"),
+            }
+        }).expect("Enum variants must have explicit u8 values");
 
         // Ignore the special "Other" variant.
         if variant_name == "Other" {
@@ -37,6 +46,10 @@ fn process_unit_enum(enum_name: Ident, data_enum: DataEnum) -> TokenStream {
 
             // Generate native accessors for the components.
             for (i, component) in components.iter().enumerate() {
+                parse_u8_arms.push(quote! {
+                    #variant_value => Ok(#enum_name :: #variant_name),
+                });
+
                 let component_name = format_ident!("{component}");
                 let clone_function_name = format_ident!("{component}_clone");
                 let with_function_name = format_ident!("with_{component}");
@@ -530,6 +543,29 @@ fn process_unit_enum(enum_name: Ident, data_enum: DataEnum) -> TokenStream {
 
     let expanded = quote! {
         #(#impls)*
+
+        impl From<#enum_name> for u8 {
+            fn from(value: #enum_name) -> u8 {
+                value as u8
+            }
+        }
+
+        impl From<&#enum_name> for u8 {
+            fn from(value: &#enum_name) -> u8 {
+                *value as u8
+            }
+        }
+
+        impl core::convert::TryFrom<u8> for #enum_name {
+            type Error = ParseCoordinateFrameError;
+
+            fn try_from(value: u8) -> Result<#enum_name, Self::Error> {
+                match value {
+                    #(#parse_u8_arms)*
+                    _ => Err(ParseCoordinateFrameError::UnknownVariant)
+                }
+            }
+        }
     };
     TokenStream::from(expanded)
 }

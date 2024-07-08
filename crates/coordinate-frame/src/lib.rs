@@ -22,104 +22,110 @@ pub enum CoordinateFrameType {
     /// Common aerospace reference frame.
     /// See [`NorthEastDown`].
     #[default]
-    NorthEastDown,
+    NorthEastDown = 0,
     /// See [`NorthEastUp`].
-    NorthEastUp,
+    NorthEastUp = 1,
     /// See [`NorthWestDown`].
-    NorthWestDown,
+    NorthWestDown = 2,
     /// See [`NorthWestUp`].
-    NorthWestUp,
+    NorthWestUp = 3,
     /// See [`NorthDownEast`].
-    NorthDownEast,
+    NorthDownEast = 4,
     /// See [`NorthDownWest`].
-    NorthDownWest,
+    NorthDownWest = 5,
     /// See [`NorthUpEast`].
-    NorthUpEast,
+    NorthUpEast = 6,
     /// See [`NorthUpWest`].
-    NorthUpWest,
+    NorthUpWest = 7,
     /// See [`EastNorthDown`].
-    EastNorthDown,
+    EastNorthDown = 8,
     /// Common geography reference frame.
     /// See [`EastNorthUp`].
-    EastNorthUp,
+    EastNorthUp = 9,
     /// See [`EastSouthDown`].
-    EastSouthDown,
+    EastSouthDown = 10,
     /// See [`EastSouthUp`].
-    EastSouthUp,
+    EastSouthUp = 11,
     /// See [`EastDownNorth`].
-    EastDownNorth,
+    EastDownNorth = 12,
     /// See [`EastDownSouth`].
-    EastDownSouth,
+    EastDownSouth = 13,
     /// See [`EastUpNorth`].
-    EastUpNorth,
+    EastUpNorth = 14,
     /// See [`EastUpSouth`].
-    EastUpSouth,
+    EastUpSouth = 15,
     /// See [`SouthEastDown`].
-    SouthEastDown,
+    SouthEastDown = 16,
     /// See [`SouthEastUp`].
-    SouthEastUp,
+    SouthEastUp = 17,
     /// See [`SouthWestDown`].
-    SouthWestDown,
+    SouthWestDown = 18,
     /// See [`SouthWestUp`].
-    SouthWestUp,
+    SouthWestUp = 19,
     /// See [`SouthDownEast`].
-    SouthDownEast,
+    SouthDownEast = 20,
     /// See [`SouthDownWest`].
-    SouthDownWest,
+    SouthDownWest = 21,
     /// See [`SouthUpEast`].
-    SouthUpEast,
+    SouthUpEast = 22,
     /// See [`SouthUpWest`].
-    SouthUpWest,
+    SouthUpWest = 23,
     /// See [`WestNorthDown`].
-    WestNorthDown,
+    WestNorthDown = 24,
     /// See [`WestNorthUp`].
-    WestNorthUp,
+    WestNorthUp = 25,
     /// See [`WestSouthDown`].
-    WestSouthDown,
+    WestSouthDown = 26,
     /// See [`WestSouthUp`].
-    WestSouthUp,
+    WestSouthUp = 27,
     /// See [`WestDownNorth`].
-    WestDownNorth,
+    WestDownNorth = 28,
     /// See [`WestDownSouth`].
-    WestDownSouth,
+    WestDownSouth = 29,
     /// See [`WestUpNorth`].
-    WestUpNorth,
+    WestUpNorth = 30,
     /// See [`WestUpSouth`].
-    WestUpSouth,
+    WestUpSouth = 31,
     /// See [`DownNorthEast`].
-    DownNorthEast,
+    DownNorthEast = 32,
     /// See [`DownNorthWest`].
-    DownNorthWest,
+    DownNorthWest = 33,
     /// See [`DownEastNorth`].
-    DownEastNorth,
+    DownEastNorth = 34,
     /// See [`DownEastSouth`].
-    DownEastSouth,
+    DownEastSouth = 35,
     /// See [`DownSouthEast`].
-    DownSouthEast,
+    DownSouthEast = 36,
     /// See [`DownSouthWest`].
-    DownSouthWest,
+    DownSouthWest = 37,
     /// See [`DownWestNorth`].
-    DownWestNorth,
+    DownWestNorth = 38,
     /// See [`DownWestSouth`].
-    DownWestSouth,
+    DownWestSouth = 39,
     /// See [`UpNorthEast`].
-    UpNorthEast,
+    UpNorthEast = 40,
     /// See [`UpNorthWest`].
-    UpNorthWest,
+    UpNorthWest = 41,
     /// See [`UpEastNorth`].
-    UpEastNorth,
+    UpEastNorth = 42,
     /// See [`UpEastSouth`].
-    UpEastSouth,
+    UpEastSouth = 43,
     /// See [`UpSouthEast`].
-    UpSouthEast,
+    UpSouthEast = 44,
     /// See [`UpSouthWest`].
-    UpSouthWest,
+    UpSouthWest = 45,
     /// See [`UpWestNorth`].
-    UpWestNorth,
+    UpWestNorth = 46,
     /// See [`UpWestSouth`].
-    UpWestSouth,
+    UpWestSouth = 47,
     /// An orientation represented by a rotation matrix.
-    Other,
+    Other = 48,
+}
+
+#[derive(Debug)]
+pub enum ParseCoordinateFrameError {
+    /// An unknown enum variant was provided.
+    UnknownVariant,
 }
 
 #[cfg(test)]

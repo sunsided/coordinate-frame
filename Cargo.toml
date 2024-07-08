@@ -1,6 +1,6 @@
 [workspace.package]
 version = "0.1.0"
-description = "Coordinate frame conversions"
+description = "Very simpe coordinate frame conversions"
 authors = ["Markus Mayer <widemeadows@gmail.com>"]
 categories = ["no-std", "no-std::no-alloc"]
 edition = "2021"

@@ -36,6 +36,7 @@ fn process_unit_enum(enum_name: Ident, data_enum: DataEnum) -> TokenStream {
             // Generate native accessors for the components.
             for (i, component) in components.iter().enumerate() {
                 let component_name = format_ident!("{component}");
+                let clone_function_name = format_ident!("{component}_clone");
                 let with_function_name = format_ident!("with_{component}");
                 let ref_function_name = format_ident!("{component}_ref");
                 let mut_function_name = format_ident!("{component}_mut");
@@ -61,6 +62,11 @@ fn process_unit_enum(enum_name: Ident, data_enum: DataEnum) -> TokenStream {
                         self.0[#i]
                     }
 
+                    #[inline]
+                    fn #clone_function_name (&self) -> T  where T: Clone {
+                        self.0[#i].clone()
+                    }
+
                     #[doc = #ref_doc_str]
                     #[inline]
                     pub const fn #ref_function_name (&self) -> &T {
@@ -81,7 +87,9 @@ fn process_unit_enum(enum_name: Ident, data_enum: DataEnum) -> TokenStream {
                 let other = pair.iter().copied().find(|&other| !other.eq(component.as_str())).expect("Failed to find component's opposite direction");
 
                 let component_name = format_ident!("{component}");
+                let clone_component_name = format_ident!("{component}_clone");
                 let other_name = format_ident!("{other}");
+                let clone_other_name = format_ident!("{other}_clone");
                 let doc_str = format!("Returns the _{other}_ component of this coordinate. This component is not a native axis of the coordinate frame and is derived from the [`{component}`](Self::{component}) component at runtime.");
 
                 components_impl.push(quote! {
@@ -89,6 +97,12 @@ fn process_unit_enum(enum_name: Ident, data_enum: DataEnum) -> TokenStream {
                     #[inline]
                     pub fn #other_name (&self) -> T  where T: Copy + SaturatingNeg<Output = T> {
                         let component = self . #component_name();
+                        component.saturating_neg()
+                    }
+                    
+                    #[inline]
+                    fn #clone_other_name (&self) -> T  where T: Clone + SaturatingNeg<Output = T> {
+                        let component = self . #clone_component_name();
                         component.saturating_neg()
                     }
                 });
@@ -148,6 +162,36 @@ fn process_unit_enum(enum_name: Ident, data_enum: DataEnum) -> TokenStream {
                         let north = self.north();
                         let up = self.up();
                         EastNorthUp::new(east, north, up)
+                    }
+                });
+            }
+
+            // Type conversion implementations.
+            let mut conversion_impl = Vec::new();
+            for other_variant in data_enum.variants.iter().filter(|other| other.ident != *variant_name) {
+                // Skip the generic fallback.
+                let other_variant = &other_variant.ident;
+                if other_variant == "Other" {
+                    continue;
+                }
+
+                let components = split_variant_name_into_components(&other_variant.to_string());
+                let first_component = format_ident!("{}", &components[0]);
+                let second_component = format_ident!("{}", &components[1]);
+                let third_component = format_ident!("{}", &components[2]);
+
+                let clone_first_component = format_ident!("{}_clone", &components[0]);
+                let clone_second_component = format_ident!("{}_clone", &components[1]);
+                let clone_third_component = format_ident!("{}_clone", &components[2]);
+
+                conversion_impl.push(quote! {
+                    impl<T> From<#variant_name <T>> for #other_variant <T> where T: Clone + SaturatingNeg<Output = T> {
+                        fn from(value: #variant_name <T>) -> #other_variant <T> {
+                            let #first_component = value. #clone_first_component ();
+                            let #second_component = value. #clone_second_component ();
+                            let #third_component = value. #clone_third_component ();
+                            #other_variant :: new(#first_component, #second_component, #third_component)
+                        }
                     }
                 });
             }
@@ -253,6 +297,8 @@ fn process_unit_enum(enum_name: Ident, data_enum: DataEnum) -> TokenStream {
                         &mut self.0
                     }
                 }
+
+                #(#conversion_impl)*
             }
         }
     });

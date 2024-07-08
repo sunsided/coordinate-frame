@@ -79,28 +79,6 @@ pub enum CoordinateFrameType {
 /// * **Z** represents the vertical axis with positive values representing "up".
 // pub struct EastNorthUp<T>([T; 3]);
 
-impl<T> From<NorthEastUp<T>> for NorthEastDown<T>
-where
-    T: SaturatingNeg<Output = T>,
-{
-    fn from(value: NorthEastUp<T>) -> Self {
-        let [north, east, up] = value.0;
-        let down = up.saturating_neg();
-        Self([north, east, down])
-    }
-}
-
-impl<T> From<NorthEastDown<T>> for EastNorthUp<T>
-where
-    T: SaturatingNeg<Output = T>,
-{
-    fn from(value: NorthEastDown<T>) -> Self {
-        let [north, east, down] = value.0;
-        let up = down.saturating_neg();
-        Self([east, north, up])
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use crate::{EastNorthUp, NorthEastDown, NorthEastUp};

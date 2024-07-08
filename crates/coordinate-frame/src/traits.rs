@@ -1,3 +1,27 @@
+use crate::{CoordinateFrameType, EastNorthUp, NorthEastDown};
+
+/// A coordinate frame.
+pub trait CoordinateFrame {
+    /// The type of each coordinate value.
+    type Type;
+
+    /// The coordinate frame type.
+    const COORDINATE_FRAME: CoordinateFrameType;
+
+    /// Returns the coordinate frame of this instance.
+    fn coordinate_frame(&self) -> CoordinateFrameType;
+
+    /// Converts this type to a [`NorthEastDown`] instance.
+    fn to_ned(&self) -> NorthEastDown<Self::Type>
+    where
+        Self::Type: Copy + SaturatingNeg<Output = Self::Type>;
+
+    /// Converts this type to an [`EastNorthUp`] instance.
+    fn to_enu(&self) -> EastNorthUp<Self::Type>
+    where
+        Self::Type: Copy + SaturatingNeg<Output = Self::Type>;
+}
+
 /// Performs a saturating negation.
 pub trait SaturatingNeg {
     type Output;

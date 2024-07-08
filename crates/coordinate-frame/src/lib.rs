@@ -8,7 +8,7 @@ pub use traits::*;
 
 #[derive(CoordinateFrame, Default, Debug, Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash)]
 #[repr(u8)]
-pub enum CoordinateFrame {
+pub enum CoordinateFrameType {
     /// Aerospace.
     #[default]
     NorthEastDown,

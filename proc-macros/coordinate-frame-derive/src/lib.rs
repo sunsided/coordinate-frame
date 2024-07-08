@@ -20,7 +20,7 @@ pub fn derive_coordinate_frame(input: TokenStream) -> TokenStream {
 }
 
 /// Processes an enum of which we assume it is unit, i.e. (all) variants have no embedded values.
-fn process_unit_enum(_name: Ident, data_enum: DataEnum) -> TokenStream {
+fn process_unit_enum(enum_name: Ident, data_enum: DataEnum) -> TokenStream {
     let impls = data_enum.variants.iter().map(|variant| {
         let variant_name = &variant.ident;
 
@@ -132,7 +132,7 @@ fn process_unit_enum(_name: Ident, data_enum: DataEnum) -> TokenStream {
             let up = String::from("up");
             if variant_name != "EastNorthUp" && components.contains(&east) && components.contains(&north) && components.contains(&up) {
                 components_impl.push(quote! {
-                    /// Converts this type to a [`NorthEastDown`] instance.
+                    /// Converts this type to an [`NorthEastDown`] instance.
                     pub const fn to_enu(&self) -> EastNorthUp<T> where T: Copy {
                         let east = self.east();
                         let north = self.north();
@@ -142,7 +142,7 @@ fn process_unit_enum(_name: Ident, data_enum: DataEnum) -> TokenStream {
                 });
             } else {
                 components_impl.push(quote! {
-                    /// Converts this type to a [`EastNorthUp`] instance.
+                    /// Converts this type to an [`EastNorthUp`] instance.
                     pub fn to_enu(&self) -> EastNorthUp<T> where T: Copy + SaturatingNeg<Output = T> {
                         let east = self.east();
                         let north = self.north();
@@ -156,6 +156,9 @@ fn process_unit_enum(_name: Ident, data_enum: DataEnum) -> TokenStream {
                 pub struct #variant_name <T>([T; 3]);
 
                 impl<T> #variant_name <T> {
+                    /// The coordinate frame.
+                    const COORDINATE_FRAME: #enum_name = #enum_name :: #variant_name;
+
                     #[doc = #new_doc]
                     pub const fn new(#first_component: T, #second_component: T, #third_component: T) -> Self {
                         Self([#first_component, #second_component, #third_component])
@@ -166,7 +169,38 @@ fn process_unit_enum(_name: Ident, data_enum: DataEnum) -> TokenStream {
                         self.0
                     }
 
+                    /// Returns the coordinate frame of this instance.
+                    pub const fn coordinate_frame(&self) -> #enum_name {
+                        Self::COORDINATE_FRAME
+                    }
+
                     #(#components_impl)*
+                }
+
+                impl<T> CoordinateFrame for #variant_name <T> {
+                    type Type = T;
+
+                    /// The coordinate frame.
+                    const COORDINATE_FRAME: #enum_name = #enum_name :: #variant_name;
+
+                    /// Returns the coordinate frame of this instance.
+                    fn coordinate_frame(&self) -> #enum_name {
+                        Self::COORDINATE_FRAME
+                    }
+
+                    /// Converts this type to a [`NorthEastDown`] instance.
+                    fn to_ned(&self) -> NorthEastDown<Self::Type>
+                    where
+                        Self::Type: Copy + SaturatingNeg<Output = Self::Type> {
+                        self.to_ned()
+                    }
+
+                    /// Converts this type to an [`EastNorthUp`] instance.
+                    fn to_enu(&self) -> EastNorthUp<Self::Type>
+                    where
+                        Self::Type: Copy + SaturatingNeg<Output = Self::Type> {
+                        self.to_enu()
+                    }
                 }
 
                 impl<T> From<#variant_name <T>> for [T; 3] {

@@ -2,9 +2,11 @@
 #![forbid(unsafe_code)]
 
 mod traits;
+
+use coordinate_frame_derive::CoordinateFrame;
 pub use traits::*;
 
-#[derive(Default, Debug, Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash)]
+#[derive(CoordinateFrame, Default, Debug, Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash)]
 #[repr(u8)]
 pub enum CoordinateFrame {
     /// Aerospace.
@@ -65,17 +67,17 @@ pub enum CoordinateFrame {
 /// * **X** represents the longitudinal axis with positive values representing "forward".
 /// * **Y** represents the lateral axis with positive values representing "right".
 /// * **Z** represents the vertical axis with positive values representing "down".
-pub struct NorthEastDown<T>([T; 3]);
+// pub struct NorthEastDown<T>([T; 3]);
 
 /// * **X** represents the longitudinal axis with positive values representing "forward".
 /// * **Y** represents the lateral axis with positive values representing "right".
 /// * **Z** represents the vertical axis with positive values representing "up".
-pub struct NorthEastUp<T>([T; 3]);
+// pub struct NorthEastUp<T>([T; 3]);
 
 /// * **X** represents the lateral axis with positive values representing "right".
 /// * **Y** represents the longitudinal axis with positive values representing "forward".
 /// * **Z** represents the vertical axis with positive values representing "up".
-pub struct EastNorthUp<T>([T; 3]);
+// pub struct EastNorthUp<T>([T; 3]);
 
 impl<T> From<NorthEastUp<T>> for NorthEastDown<T>
 where
@@ -105,8 +107,25 @@ mod tests {
 
     #[test]
     fn neu_to_ned() {
-        let neu = NorthEastUp([1.0, 2.0, 3.0]);
+        let neu = NorthEastUp([0.0, 2.0, 3.0]);
+        let neu = neu.with_north(1.0);
+
+        assert_eq!(neu.north(), 1.0);
+        assert_eq!(neu.east(), 2.0);
+        assert_eq!(neu.up(), 3.0);
+
+        // Generated
+        assert_eq!(neu.down(), -3.0);
+
+        assert_eq!(neu.north_ref(), &1.0);
+        assert_eq!(neu.east_ref(), &2.0);
+        assert_eq!(neu.up_ref(), &3.0);
+
         let ned: NorthEastDown<_> = neu.into();
+        assert_eq!(ned.north(), 1.0);
+        assert_eq!(ned.east(), 2.0);
+        assert_eq!(ned.down(), -3.0);
+
         assert_eq!(ned.0, [1.0, 2.0, -3.0]);
     }
 

@@ -1,0 +1,18 @@
+[package]
+name = "coordinate-frame"
+description.workspace = true
+version.workspace = true
+authors.workspace = true
+categories.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+rust-version.workspace = true
+readme = "../../README.md"
+
+[features]
+std = []
+
+[dependencies]
+coordinate-frame-derive = { version = "0.1.0", path = "../../proc-macros/coordinate-frame-derive" }

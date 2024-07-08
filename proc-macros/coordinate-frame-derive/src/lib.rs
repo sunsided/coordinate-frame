@@ -198,27 +198,48 @@ fn process_unit_enum(enum_name: Ident, data_enum: DataEnum) -> TokenStream {
                 });
             }
 
+            // Handedness
+            let right_handed = is_right_handed(&components[0], &components[1], &components[2]);
+
+            let mut handedness_impl = Vec::new();
+            if right_handed {
+                handedness_impl.push(quote!{
+                    impl<T> RightHanded for #variant_name <T> {}
+                });
+            } else {
+                handedness_impl.push(quote!{
+                    impl<T> LeftHanded for #variant_name <T> {}
+                });
+            }
+
             // Documentation for x, y and z.
             let x_doc = format!("For this type, this represents the _{first_component}_ direction.");
             let y_doc = format!("For this type, this represents the _{second_component}_ direction.");
             let z_doc = format!("For this type, this represents the _{third_component}_ direction.");
 
             // Long documentation for the type.
-            let mut doc_long = format!("# A {}, {} and {} frame", components[0], components[1], components[2]);
-            if variant_name == "NorthEastDown" {
-                doc_long.push_str(" (aeronautics)");
-            } else if variant_name == "EastNorthUp" {
-                doc_long.push_str(" (geography)");
-            }
-
-            let handedness = if is_right_handed(&components[0], &components[1], &components[2]) {
+            let handedness = if right_handed {
                 "right-handed"
             }  else { "left-handed" };
+
+            let handedness_emoji = if right_handed {
+                "🫱"
+            }  else { "🫲" };
+
+            let mut doc_long = format!("# A {}, {} and {} frame", components[0], components[1], components[2]);
+            if variant_name == "NorthEastDown" {
+                doc_long.push_str(&format!(" ({handedness}, aeronautics)"));
+            } else if variant_name == "EastNorthUp" {
+                doc_long.push_str(&format!(" ({handedness}, geography)"));
+            } else {
+                doc_long.push_str(&format!(" ({handedness})"));
+            }
+
             let x_dir_human = axis_direction_human(&components[0]);
             let y_dir_human = axis_direction_human(&components[1]);
             let z_dir_human = axis_direction_human(&components[2]);
 
-            let doc_long_second = format!("This resembles a {} coordinate system representing the {}, {} and {} directions, respectively.", handedness,
+            let doc_long_second = format!("This resembles a {handedness_emoji} {} coordinate system representing the {}, {} and {} directions, respectively.", handedness,
                                           x_dir_human, y_dir_human, z_dir_human);
 
             let x_doc_long = format!("* [`x`](Self::x) represents _{}_, i.e. the {} axis with positive values representing \"{}\".",
@@ -298,6 +319,11 @@ fn process_unit_enum(enum_name: Ident, data_enum: DataEnum) -> TokenStream {
                         Self::COORDINATE_FRAME
                     }
 
+                    /// Indicates whether this coordinate system is right-handed or left-handed.
+                    pub const fn right_handed(&self) -> bool {
+                        #right_handed
+                    }
+
                     #(#components_impl)*
                 }
 
@@ -361,6 +387,11 @@ fn process_unit_enum(enum_name: Ident, data_enum: DataEnum) -> TokenStream {
                     fn z_ref(&self) -> &Self::Type {
                         self.z_ref()
                     }
+
+                    /// Indicates whether this coordinate system is right-handed or left-handed.
+                    fn right_handed(&self) -> bool {
+                        self.right_handed()
+                    }
                 }
 
                 impl<T> From<#variant_name <T>> for [T; 3] {
@@ -414,6 +445,7 @@ fn process_unit_enum(enum_name: Ident, data_enum: DataEnum) -> TokenStream {
                     }
                 }
 
+                #(#handedness_impl)*
                 #(#conversion_impl)*
             }
         }

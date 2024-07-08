@@ -44,7 +44,16 @@ pub trait CoordinateFrame {
 
     /// Gets the value of the third dimension.
     fn z_ref(&self) -> &Self::Type;
+
+    /// Indicates whether this coordinate system is right-handed or left-handed.
+    fn right_handed(&self) -> bool;
 }
+
+/// Marks a right-handed coordinate system.
+pub trait RightHanded {}
+
+/// Marks a left-handed coordinate system.
+pub trait LeftHanded {}
 
 /// Performs a saturating negation.
 pub trait SaturatingNeg {

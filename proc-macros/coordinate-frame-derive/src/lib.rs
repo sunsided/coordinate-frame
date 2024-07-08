@@ -296,22 +296,40 @@ fn process_unit_enum(enum_name: Ident, data_enum: DataEnum) -> TokenStream {
                         self.0[2].clone()
                     }
 
-                    /// Gets the value of the first dimension.
+                    /// Gets a reference to the value of the first dimension.
                     #[doc = #x_doc]
                     pub fn x_ref(&self) -> &T {
                         &self.0[0]
                     }
 
-                    /// Gets the value of the second dimension.
+                    /// Gets a reference to the value of the second dimension.
                     #[doc = #y_doc]
                     pub fn y_ref(&self) -> &T {
                         &self.0[1]
                     }
 
-                    /// Gets the value of the third dimension.
+                    /// Gets a reference to the value of the third dimension.
                     #[doc = #z_doc]
                     pub fn z_ref(&self) -> &T {
                         &self.0[2]
+                    }
+
+                    /// Gets a mutable reference to the value of the first dimension.
+                    #[doc = #x_doc]
+                    pub fn x_mut(&mut self) -> &mut T {
+                        &mut self.0[0]
+                    }
+
+                    /// Gets a mutable reference to the value of the second dimension.
+                    #[doc = #y_doc]
+                    pub fn y_mut(&mut self) -> &mut T {
+                        &mut self.0[1]
+                    }
+
+                    /// Gets a mutable reference to the value of the third dimension.
+                    #[doc = #z_doc]
+                    pub fn z_mut(&mut self) -> &mut T {
+                        &mut self.0[2]
                     }
 
                     /// Consumes self and returns its inner value.
@@ -390,22 +408,40 @@ fn process_unit_enum(enum_name: Ident, data_enum: DataEnum) -> TokenStream {
                         self.z()
                     }
 
-                    /// Gets the value of the first dimension.
+                    /// Gets a reference to the value of the first dimension.
                     #[doc = #x_doc]
                     fn x_ref(&self) -> &Self::Type {
                         self.x_ref()
                     }
 
-                    /// Gets the value of the second dimension.
+                    /// Gets a reference to the value of the second dimension.
                     #[doc = #y_doc]
                     fn y_ref(&self) -> &Self::Type {
                         self.y_ref()
                     }
 
-                    /// Gets the value of the third dimension.
+                    /// Gets a reference to the value of the third dimension.
                     #[doc = #z_doc]
                     fn z_ref(&self) -> &Self::Type {
                         self.z_ref()
+                    }
+
+                    /// Gets a mutable reference to the value of the first dimension.
+                    #[doc = #x_doc]
+                    fn x_mut(&mut self) -> &mut Self::Type {
+                        self.x_mut()
+                    }
+
+                    /// Gets a mutable reference to the value of the second dimension.
+                    #[doc = #y_doc]
+                    fn y_mut(&mut self) -> &mut Self::Type {
+                        self.y_mut()
+                    }
+
+                    /// Gets a mutable reference to the value of the third dimension.
+                    #[doc = #z_doc]
+                    fn z_mut(&mut self) -> &mut Self::Type {
+                        self.z_mut()
                     }
 
                     /// Indicates whether this coordinate system is right-handed or left-handed.

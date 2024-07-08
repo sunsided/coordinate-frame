@@ -36,14 +36,23 @@ pub trait CoordinateFrame {
     where
         Self::Type: Clone;
 
-    /// Gets the value of the first dimension.
+    /// Gets a reference to the value of the first dimension.
     fn x_ref(&self) -> &Self::Type;
 
-    /// Gets the value of the second dimension.
+    /// Gets a reference to the value of the second dimension.
     fn y_ref(&self) -> &Self::Type;
 
-    /// Gets the value of the third dimension.
+    /// Gets a reference to the value of the third dimension.
     fn z_ref(&self) -> &Self::Type;
+
+    /// Gets a mutable reference to the value of the first dimension.
+    fn x_mut(&mut self) -> &mut Self::Type;
+
+    /// Gets a mutable reference to the value of the second dimension.
+    fn y_mut(&mut self) -> &mut Self::Type;
+
+    /// Gets a mutable reference to the value of the third dimension.
+    fn z_mut(&mut self) -> &mut Self::Type;
 
     /// Indicates whether this coordinate system is right-handed or left-handed.
     fn right_handed(&self) -> bool;

@@ -10,28 +10,27 @@
 //! ```
 //! use coordinate_frame::{NorthEastDown, NorthEastUp};
 //!
+//! // Construct a coordinate in one reference frame.
 //! let neu = NorthEastUp::new(1.0, 2.0, 3.0);
-//!
 //! assert_eq!(neu.north(), 1.0);
 //! assert_eq!(neu.east(), 2.0);
 //! assert_eq!(neu.up(), 3.0);
 //!
-//! // Generated
+//! // Note that "non-native" axes are also available.
 //! assert_eq!(neu.down(), -3.0);
 //!
-//! assert_eq!(neu.north_ref(), &1.0);
-//! assert_eq!(neu.east_ref(), &2.0);
-//! assert_eq!(neu.up_ref(), &3.0);
-//!
+//! // You can transform it into a different frame.
 //! let ned: NorthEastDown<_> = neu.into();
 //! assert_eq!(ned.north(), 1.0);
 //! assert_eq!(ned.east(), 2.0);
 //! assert_eq!(ned.down(), -3.0);
 //!
+//! // Information is available as you'd expect.
 //! assert_eq!(ned, &[1.0, 2.0, -3.0]);
 //! assert_eq!(ned.x(), 1.0);
 //! assert_eq!(ned.z(), -3.0);
 //!
+//! // Base vectors are also provided.
 //! let axis = NorthEastDown::<f64>::z_axis();
 //! assert_eq!(axis, [0.0, 0.0, -1.0]);
 //! ```

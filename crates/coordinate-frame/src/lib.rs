@@ -149,6 +149,8 @@ pub enum CoordinateFrameType {
     UpWestSouth = 47,
     /// An orientation represented by a rotation matrix.
     Other = 48,
+    /// An undefined system.
+    Undefined = 255,
 }
 
 #[derive(Debug)]

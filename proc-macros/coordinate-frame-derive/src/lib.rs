@@ -51,7 +51,7 @@ fn process_unit_enum(enum_name: Ident, data_enum: DataEnum) -> TokenStream {
         });
 
         // Ignore the special "Other" variant.
-        if variant_name == "Other" {
+        if variant_name == "Other" || variant_name == "Undefined" {
             quote! {}
         } else {
             let components = split_variant_name_into_components(&variant_name.to_string());
@@ -197,7 +197,7 @@ fn process_unit_enum(enum_name: Ident, data_enum: DataEnum) -> TokenStream {
             for other_variant in data_enum.variants.iter().filter(|other| other.ident != *variant_name) {
                 // Skip the generic fallback.
                 let other_variant = &other_variant.ident;
-                if other_variant == "Other" {
+                if other_variant == "Other" || other_variant == "Undefined" {
                     continue;
                 }
 

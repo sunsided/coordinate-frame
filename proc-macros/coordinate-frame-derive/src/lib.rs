@@ -76,7 +76,7 @@ fn process_unit_enum(_name: Ident, data_enum: DataEnum) -> TokenStream {
             }
 
             // Generate derived pairs.
-            for component  in components {
+            for component  in components.iter() {
                 let pair = MUTUALLY_EXCLUSIVE.iter().copied().find(|&pair| pair.contains(&component.as_str())).expect("Failed to identify component pair");
                 let other = pair.iter().copied().find(|&other| !other.eq(component.as_str())).expect("Failed to find component's opposite direction");
 
@@ -94,12 +94,38 @@ fn process_unit_enum(_name: Ident, data_enum: DataEnum) -> TokenStream {
                 });
             }
 
+            // Create constructor.
+            let first_component = format_ident!("{}", &components[0]);
+            let second_component = format_ident!("{}", &components[1]);
+            let third_component = format_ident!("{}", &components[2]);
+            let new_doc = format!("Creates a new [`{variant_name}`] instance from its _{}_, _{}_ and _{}_ components.",
+                &components[0], &components[1], &components[2]
+            );
+
             if let Fields::Unit = &variant.fields {
                 quote! {
                     pub struct #variant_name <T>([T; 3]);
 
                     impl<T> #variant_name <T> {
+                        #[doc = #new_doc]
+                        pub const fn new(#first_component: T, #second_component: T, #third_component: T) -> Self {
+                            Self([#first_component, #second_component, #third_component])
+                        }
+
                         #(#components_impl)*
+                    }
+
+                    impl<T> From<#variant_name <T>> for [T; 3] {
+                        fn from(value: #variant_name <T>) -> [T; 3] {
+                            self.0
+                        }
+                    }
+
+                    impl<T> From<#variant_name <T>> for (T, T, T) {
+                        fn from(value: #variant_name <T>) -> [T; 3] {
+                            let [x, y, z] = self.0;
+                            (x, y, z)
+                        }
                     }
                 }
             } else {

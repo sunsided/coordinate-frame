@@ -107,7 +107,7 @@ mod tests {
 
     #[test]
     fn neu_to_ned() {
-        let neu = NorthEastUp([0.0, 2.0, 3.0]);
+        let neu = NorthEastUp::new(0.0, 2.0, 3.0);
         let neu = neu.with_north(1.0);
 
         assert_eq!(neu.north(), 1.0);

@@ -24,6 +24,8 @@ pub fn derive_coordinate_frame(input: TokenStream) -> TokenStream {
 /// Processes an enum of which we assume it is unit, i.e. (all) variants have no embedded values.
 fn process_unit_enum(enum_name: Ident, data_enum: DataEnum) -> TokenStream {
     let mut parse_u8_arms = Vec::new();
+    let mut defmt_arms = Vec::new();
+    let mut display_arms = Vec::new();
 
     let impls = data_enum.variants.iter().map(|variant| {
         let variant_name = &variant.ident;
@@ -35,6 +37,19 @@ fn process_unit_enum(enum_name: Ident, data_enum: DataEnum) -> TokenStream {
             }
         }).expect("Enum variants must have explicit u8 values");
 
+        let variant_name_str = format!("{variant_name}");
+        display_arms.push(quote! {
+            #enum_name :: #variant_name  => f.write_str(#variant_name_str),
+        });
+        
+        defmt_arms.push(quote! {
+            #enum_name :: #variant_name  => defmt::write!(f, #variant_name_str),
+        });
+
+        parse_u8_arms.push(quote! {
+            #variant_value => Ok(#enum_name :: #variant_name),
+        });
+        
         // Ignore the special "Other" variant.
         if variant_name == "Other" {
             quote! {}
@@ -46,10 +61,6 @@ fn process_unit_enum(enum_name: Ident, data_enum: DataEnum) -> TokenStream {
 
             // Generate native accessors for the components.
             for (i, component) in components.iter().enumerate() {
-                parse_u8_arms.push(quote! {
-                    #variant_value => Ok(#enum_name :: #variant_name),
-                });
-
                 let component_name = format_ident!("{component}");
                 let clone_function_name = format_ident!("{component}_clone");
                 let with_function_name = format_ident!("with_{component}");
@@ -563,6 +574,24 @@ fn process_unit_enum(enum_name: Ident, data_enum: DataEnum) -> TokenStream {
                 match value {
                     #(#parse_u8_arms)*
                     _ => Err(ParseCoordinateFrameError::UnknownVariant)
+                }
+            }
+        }
+        
+        impl core::fmt::Display for #enum_name {
+            fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+                match self {
+                    #(#display_arms)*
+                }
+            }
+        }
+
+        #[cfg(feature = "defmt")]
+        #[cfg_attr(docsrs, doc(cfg(feature = "defmt")))]
+        impl defmt::Format for #enum_name {
+            fn format(&self, f: defmt::Formatter) {
+                match self {
+                    #(#defmt_arms)*
                 }
             }
         }

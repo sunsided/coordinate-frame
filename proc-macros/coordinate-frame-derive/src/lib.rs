@@ -99,7 +99,7 @@ fn process_unit_enum(enum_name: Ident, data_enum: DataEnum) -> TokenStream {
                         let component = self . #component_name();
                         component.saturating_neg()
                     }
-                    
+
                     #[inline]
                     fn #clone_other_name (&self) -> T  where T: Clone + SaturatingNeg<Output = T> {
                         let component = self . #clone_component_name();
@@ -196,6 +196,11 @@ fn process_unit_enum(enum_name: Ident, data_enum: DataEnum) -> TokenStream {
                 });
             }
 
+            // Documentation for x, y and z.
+            let x_doc = format!("For this type, this represents the _{first_component}_ direction.");
+            let y_doc = format!("For this type, this represents the _{second_component}_ direction.");
+            let z_doc = format!("For this type, this represents the _{third_component}_ direction.");
+
             quote! {
                 pub struct #variant_name <T>([T; 3]);
 
@@ -206,6 +211,42 @@ fn process_unit_enum(enum_name: Ident, data_enum: DataEnum) -> TokenStream {
                     #[doc = #new_doc]
                     pub const fn new(#first_component: T, #second_component: T, #third_component: T) -> Self {
                         Self([#first_component, #second_component, #third_component])
+                    }
+
+                    /// Gets the value of the first dimension.
+                    #[doc = #x_doc]
+                    pub fn x(&self) -> T where T: Clone {
+                        self.0[0].clone()
+                    }
+
+                    /// Gets the value of the second dimension.
+                    #[doc = #y_doc]
+                    pub fn y(&self) -> T where T: Clone {
+                        self.0[1].clone()
+                    }
+
+                    /// Gets the value of the third dimension.
+                    #[doc = #z_doc]
+                    pub fn z(&self) -> T where T: Clone {
+                        self.0[2].clone()
+                    }
+
+                    /// Gets the value of the first dimension.
+                    #[doc = #x_doc]
+                    pub fn x_ref(&self) -> &T {
+                        &self.0[0]
+                    }
+
+                    /// Gets the value of the second dimension.
+                    #[doc = #y_doc]
+                    pub fn y_ref(&self) -> &T {
+                        &self.0[1]
+                    }
+
+                    /// Gets the value of the third dimension.
+                    #[doc = #z_doc]
+                    pub fn z_ref(&self) -> &T {
+                        &self.0[2]
                     }
 
                     /// Consumes self and returns its inner value.
@@ -244,6 +285,42 @@ fn process_unit_enum(enum_name: Ident, data_enum: DataEnum) -> TokenStream {
                     where
                         Self::Type: Copy + SaturatingNeg<Output = Self::Type> {
                         self.to_enu()
+                    }
+
+                    /// Gets the value of the first dimension.
+                    #[doc = #x_doc]
+                    fn x(&self) -> Self::Type where Self::Type: Clone {
+                        self.x()
+                    }
+
+                    /// Gets the value of the second dimension.
+                    #[doc = #y_doc]
+                    fn y(&self) -> Self::Type where Self::Type: Clone {
+                        self.y()
+                    }
+
+                    /// Gets the value of the third dimension.
+                    #[doc = #z_doc]
+                    fn z(&self) -> Self::Type where Self::Type: Clone {
+                        self.z()
+                    }
+
+                    /// Gets the value of the first dimension.
+                    #[doc = #x_doc]
+                    fn x_ref(&self) -> &Self::Type {
+                        self.x_ref()
+                    }
+
+                    /// Gets the value of the second dimension.
+                    #[doc = #y_doc]
+                    fn y_ref(&self) -> &Self::Type {
+                        self.y_ref()
+                    }
+
+                    /// Gets the value of the third dimension.
+                    #[doc = #z_doc]
+                    fn z_ref(&self) -> &Self::Type {
+                        self.z_ref()
                     }
                 }
 

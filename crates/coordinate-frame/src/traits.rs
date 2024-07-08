@@ -20,6 +20,30 @@ pub trait CoordinateFrame {
     fn to_enu(&self) -> EastNorthUp<Self::Type>
     where
         Self::Type: Copy + SaturatingNeg<Output = Self::Type>;
+
+    /// Gets the value of the first dimension.
+    fn x(&self) -> Self::Type
+    where
+        Self::Type: Clone;
+
+    /// Gets the value of the second dimension.
+    fn y(&self) -> Self::Type
+    where
+        Self::Type: Clone;
+
+    /// Gets the value of the third dimension.
+    fn z(&self) -> Self::Type
+    where
+        Self::Type: Clone;
+
+    /// Gets the value of the first dimension.
+    fn x_ref(&self) -> &Self::Type;
+
+    /// Gets the value of the second dimension.
+    fn y_ref(&self) -> &Self::Type;
+
+    /// Gets the value of the third dimension.
+    fn z_ref(&self) -> &Self::Type;
 }
 
 /// Performs a saturating negation.

@@ -536,6 +536,125 @@ fn process_unit_enum(enum_name: Ident, data_enum: DataEnum) -> TokenStream {
                     }
                 }
 
+                #[cfg(feature = "micromath")]
+                #[cfg_attr(docsrs, doc(cfg(feature = "micromath")))]
+                impl From<micromath::vector::F32x3> for #variant_name <f32> {
+                    fn from(value: micromath::vector::F32x3) -> #variant_name <f32> {
+                        Self([value.x, value.y, value.z])
+                    }
+                }
+
+                #[cfg(feature = "micromath")]
+                #[cfg_attr(docsrs, doc(cfg(feature = "micromath")))]
+                impl From<#variant_name <f32>> for micromath::vector::F32x3 {
+                    fn from(value: #variant_name <f32>) -> micromath::vector::F32x3 {
+                        let [x, y, z] = value.0;
+                        Self { x, y, z }
+                    }
+                }
+
+                #[cfg(feature = "micromath")]
+                #[cfg_attr(docsrs, doc(cfg(feature = "micromath")))]
+                impl From<micromath::vector::U32x3> for #variant_name <u32> {
+                    fn from(value: micromath::vector::U32x3) -> #variant_name <u32> {
+                        Self([value.x, value.y, value.z])
+                    }
+                }
+
+                #[cfg(feature = "micromath")]
+                #[cfg_attr(docsrs, doc(cfg(feature = "micromath")))]
+                impl From<#variant_name <u32>> for micromath::vector::U32x3 {
+                    fn from(value: #variant_name <u32>) -> micromath::vector::U32x3 {
+                        let [x, y, z] = value.0;
+                        Self { x, y, z }
+                    }
+                }
+
+                #[cfg(feature = "micromath")]
+                #[cfg_attr(docsrs, doc(cfg(feature = "micromath")))]
+                impl From<micromath::vector::I32x3> for #variant_name <i32> {
+                    fn from(value: micromath::vector::I32x3) -> #variant_name <i32> {
+                        Self([value.x, value.y, value.z])
+                    }
+                }
+
+                #[cfg(feature = "micromath")]
+                #[cfg_attr(docsrs, doc(cfg(feature = "micromath")))]
+                impl From<#variant_name <i32>> for micromath::vector::I32x3 {
+                    fn from(value: #variant_name <i32>) -> micromath::vector::I32x3 {
+                        let [x, y, z] = value.0;
+                        Self { x, y, z }
+                    }
+                }
+
+                #[cfg(feature = "micromath")]
+                #[cfg_attr(docsrs, doc(cfg(feature = "micromath")))]
+                impl From<micromath::vector::U16x3> for #variant_name <u16> {
+                    fn from(value: micromath::vector::U16x3) -> #variant_name <u16> {
+                        Self([value.x, value.y, value.z])
+                    }
+                }
+
+                #[cfg(feature = "micromath")]
+                #[cfg_attr(docsrs, doc(cfg(feature = "micromath")))]
+                impl From<#variant_name <u16>> for micromath::vector::U16x3 {
+                    fn from(value: #variant_name <u16>) -> micromath::vector::U16x3 {
+                        let [x, y, z] = value.0;
+                        Self { x, y, z }
+                    }
+                }
+
+                #[cfg(feature = "micromath")]
+                #[cfg_attr(docsrs, doc(cfg(feature = "micromath")))]
+                impl From<micromath::vector::I16x3> for #variant_name <i16> {
+                    fn from(value: micromath::vector::I16x3) -> #variant_name <i16> {
+                        Self([value.x, value.y, value.z])
+                    }
+                }
+
+                #[cfg(feature = "micromath")]
+                #[cfg_attr(docsrs, doc(cfg(feature = "micromath")))]
+                impl From<#variant_name <i16>> for micromath::vector::I16x3 {
+                    fn from(value: #variant_name <i16>) -> micromath::vector::I16x3 {
+                        let [x, y, z] = value.0;
+                        Self { x, y, z }
+                    }
+                }
+
+                #[cfg(feature = "micromath")]
+                #[cfg_attr(docsrs, doc(cfg(feature = "micromath")))]
+                impl From<micromath::vector::U8x3> for #variant_name <u8> {
+                    fn from(value: micromath::vector::U8x3) -> #variant_name <u8> {
+                        Self([value.x, value.y, value.z])
+                    }
+                }
+
+                #[cfg(feature = "micromath")]
+                #[cfg_attr(docsrs, doc(cfg(feature = "micromath")))]
+                impl From<#variant_name <u8>> for micromath::vector::U8x3 {
+                    fn from(value: #variant_name <u8>) -> micromath::vector::U8x3 {
+                        let [x, y, z] = value.0;
+                        Self { x, y, z }
+                    }
+                }
+
+                #[cfg(feature = "micromath")]
+                #[cfg_attr(docsrs, doc(cfg(feature = "micromath")))]
+                impl From<micromath::vector::I8x3> for #variant_name <i8> {
+                    fn from(value: micromath::vector::I8x3) -> #variant_name <i8> {
+                        Self([value.x, value.y, value.z])
+                    }
+                }
+
+                #[cfg(feature = "micromath")]
+                #[cfg_attr(docsrs, doc(cfg(feature = "micromath")))]
+                impl From<#variant_name <i8>> for micromath::vector::I8x3 {
+                    fn from(value: #variant_name <i8>) -> micromath::vector::I8x3 {
+                        let [x, y, z] = value.0;
+                        Self { x, y, z }
+                    }
+                }
+
                 impl<T> core::convert::AsRef<[T; 3]> for #variant_name <T> {
                     fn as_ref(&self) -> &[T; 3] {
                         &self.0

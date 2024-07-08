@@ -112,19 +112,62 @@ fn process_unit_enum(_name: Ident, data_enum: DataEnum) -> TokenStream {
                             Self([#first_component, #second_component, #third_component])
                         }
 
+                        /// Consumes self and returns its inner value.
+                        pub const fn into_inner(self) -> [T; 3] where T: Copy {
+                            self.0
+                        }
+
                         #(#components_impl)*
                     }
 
                     impl<T> From<#variant_name <T>> for [T; 3] {
                         fn from(value: #variant_name <T>) -> [T; 3] {
-                            self.0
+                            value.0
                         }
                     }
 
                     impl<T> From<#variant_name <T>> for (T, T, T) {
-                        fn from(value: #variant_name <T>) -> [T; 3] {
-                            let [x, y, z] = self.0;
+                        fn from(value: #variant_name <T>) -> (T, T, T) {
+                            let [x, y, z] = value.0;
                             (x, y, z)
+                        }
+                    }
+
+                    impl<T> core::convert::AsRef<[T; 3]> for #variant_name <T> {
+                        fn as_ref(&self) -> &[T; 3] {
+                            &self.0
+                        }
+                    }
+
+                    impl<T> core::convert::AsRef<[T]> for #variant_name <T> {
+                        fn as_ref(&self) -> &[T] {
+                            &self.0
+                        }
+                    }
+
+                    impl<T> core::convert::AsMut<[T; 3]> for #variant_name <T> {
+                        fn as_mut(&mut self) -> &mut [T; 3] {
+                            &mut self.0
+                        }
+                    }
+
+                    impl<T> core::convert::AsMut<[T]> for #variant_name <T> {
+                        fn as_mut(&mut self) -> &mut [T] {
+                            &mut self.0
+                        }
+                    }
+
+                    impl<T> core::ops::Deref for #variant_name <T> {
+                        type Target = [T; 3];
+
+                        fn deref(&self) -> &Self::Target {
+                            &self.0
+                        }
+                    }
+
+                    impl<T> core::ops::DerefMut for #variant_name <T> {
+                        fn deref_mut(&mut self) -> &mut Self::Target {
+                            &mut self.0
                         }
                     }
                 }

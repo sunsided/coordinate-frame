@@ -41,7 +41,7 @@ fn process_unit_enum(enum_name: Ident, data_enum: DataEnum) -> TokenStream {
         display_arms.push(quote! {
             #enum_name :: #variant_name  => f.write_str(#variant_name_str),
         });
-        
+
         defmt_arms.push(quote! {
             #enum_name :: #variant_name  => defmt::write!(f, #variant_name_str),
         });
@@ -49,7 +49,7 @@ fn process_unit_enum(enum_name: Ident, data_enum: DataEnum) -> TokenStream {
         parse_u8_arms.push(quote! {
             #variant_value => Ok(#enum_name :: #variant_name),
         });
-        
+
         // Ignore the special "Other" variant.
         if variant_name == "Other" {
             quote! {}
@@ -291,7 +291,30 @@ fn process_unit_enum(enum_name: Ident, data_enum: DataEnum) -> TokenStream {
                 #[doc = #x_doc_long]
                 #[doc = #y_doc_long]
                 #[doc = #z_doc_long]
+                #[derive(Debug, Copy, Clone, Eq, PartialEq, Ord, PartialOrd)]
                 pub struct #variant_name <T>([T; 3]);
+
+                impl<T> core::fmt::Display for #variant_name <T> where T: core::fmt::Display {
+                    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+                        use core::fmt::Write;
+                        f.write_str(#variant_name_str)?;
+                        f.write_char('(')?;
+                        core::fmt::Display::fmt(&self.0[0], f)?;
+                        f.write_str(", ")?;
+                        core::fmt::Display::fmt(&self.0[1], f)?;
+                        f.write_str(", ")?;
+                        core::fmt::Display::fmt(&self.0[2], f)?;
+                        f.write_char(')')
+                    }
+                }
+
+                #[cfg(feature = "defmt")]
+                #[cfg_attr(docsrs, doc(cfg(feature = "defmt")))]
+                impl<T> defmt::Format for #variant_name <T> where T: defmt::Format {
+                    fn format(&self, f: defmt::Formatter) {
+                        defmt::write!(f, "{}({}, {}, {})", #variant_name_str, self.0[0], self.0[1], self.0[2])
+                    }
+                }
 
                 impl<T> #variant_name <T> {
                     /// The coordinate frame.
@@ -577,7 +600,7 @@ fn process_unit_enum(enum_name: Ident, data_enum: DataEnum) -> TokenStream {
                 }
             }
         }
-        
+
         impl core::fmt::Display for #enum_name {
             fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
                 match self {

@@ -12,7 +12,14 @@ rust-version.workspace = true
 readme = "../../README.md"
 
 [features]
+default = ["num-traits"]
 std = []
+num-traits = ["dep:num-traits"]
 
 [dependencies]
 coordinate-frame-derive = { version = "0.1.0", path = "../../proc-macros/coordinate-frame-derive" }
+num-traits = { version = "0.2.19", optional = true }
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]

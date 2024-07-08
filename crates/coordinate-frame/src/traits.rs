@@ -55,6 +55,17 @@ pub trait RightHanded {}
 /// Marks a left-handed coordinate system.
 pub trait LeftHanded {}
 
+/// Provides the values zero and one.
+pub trait ZeroOne {
+    type Output;
+
+    /// Provides the value zero (`0`).
+    fn zero() -> Self::Output;
+
+    /// Provides the value one (`1`).
+    fn one() -> Self::Output;
+}
+
 /// Performs a saturating negation.
 pub trait SaturatingNeg {
     type Output;
@@ -116,5 +127,174 @@ impl SaturatingNeg for f64 {
 
     fn saturating_neg(self) -> Self {
         -self
+    }
+}
+
+#[cfg(not(feature = "num-traits"))]
+impl ZeroOne for u8 {
+    type Output = Self;
+
+    fn zero() -> Self::Output {
+        0
+    }
+
+    fn one() -> Self::Output {
+        1
+    }
+}
+
+#[cfg(not(feature = "num-traits"))]
+impl ZeroOne for i8 {
+    type Output = Self;
+
+    fn zero() -> Self::Output {
+        0
+    }
+
+    fn one() -> Self::Output {
+        1
+    }
+}
+
+#[cfg(not(feature = "num-traits"))]
+impl ZeroOne for u16 {
+    type Output = Self;
+
+    fn zero() -> Self::Output {
+        0
+    }
+
+    fn one() -> Self::Output {
+        1
+    }
+}
+
+#[cfg(not(feature = "num-traits"))]
+impl ZeroOne for i16 {
+    type Output = Self;
+
+    fn zero() -> Self::Output {
+        0
+    }
+
+    fn one() -> Self::Output {
+        1
+    }
+}
+
+#[cfg(not(feature = "num-traits"))]
+impl ZeroOne for u32 {
+    type Output = Self;
+
+    fn zero() -> Self::Output {
+        0
+    }
+
+    fn one() -> Self::Output {
+        1
+    }
+}
+
+#[cfg(not(feature = "num-traits"))]
+impl ZeroOne for i32 {
+    type Output = Self;
+
+    fn zero() -> Self::Output {
+        0
+    }
+
+    fn one() -> Self::Output {
+        1
+    }
+}
+
+#[cfg(not(feature = "num-traits"))]
+impl ZeroOne for u64 {
+    type Output = Self;
+
+    fn zero() -> Self::Output {
+        0
+    }
+
+    fn one() -> Self::Output {
+        1
+    }
+}
+
+#[cfg(not(feature = "num-traits"))]
+impl ZeroOne for i64 {
+    type Output = Self;
+
+    fn zero() -> Self::Output {
+        0
+    }
+
+    fn one() -> Self::Output {
+        1
+    }
+}
+
+#[cfg(not(feature = "num-traits"))]
+impl ZeroOne for u128 {
+    type Output = Self;
+
+    fn zero() -> Self::Output {
+        0
+    }
+
+    fn one() -> Self::Output {
+        1
+    }
+}
+
+#[cfg(not(feature = "num-traits"))]
+impl ZeroOne for i128 {
+    type Output = Self;
+
+    fn zero() -> Self::Output {
+        0
+    }
+
+    fn one() -> Self::Output {
+        1
+    }
+}
+
+#[cfg(not(feature = "num-traits"))]
+impl ZeroOne for f32 {
+    type Output = Self;
+
+    fn zero() -> Self::Output {
+        0.0
+    }
+
+    fn one() -> Self::Output {
+        1.0
+    }
+}
+
+#[cfg(not(feature = "num-traits"))]
+impl ZeroOne for f64 {
+    type Output = Self;
+
+    fn zero() -> Self::Output {
+        0.0
+    }
+
+    fn one() -> Self::Output {
+        1.0
+    }
+}
+
+#[cfg(feature = "num-traits")]
+impl<T> ZeroOne for T where T: num_traits::Zero + num_traits::One {
+    type Output = T;
+
+    fn zero() -> Self::Output {
+        <T as num_traits::Zero>::zero()
+    }
+
+    fn one() -> Self::Output {
+        <T as num_traits::One>::one()
     }
 }

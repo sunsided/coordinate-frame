@@ -102,6 +102,56 @@ fn process_unit_enum(_name: Ident, data_enum: DataEnum) -> TokenStream {
                 &components[0], &components[1], &components[2]
             );
 
+            // Provide conversion to North, East, Down
+            let north = String::from("north");
+            let east = String::from("east");
+            let down = String::from("down");
+            if variant_name != "NorthEastDown" && components.contains(&north) && components.contains(&east) && components.contains(&down) {
+                components_impl.push(quote! {
+                    /// Converts this type to a [`NorthEastDown`] instance.
+                    pub const fn to_ned(&self) -> NorthEastDown<T> where T: Copy {
+                        let north = self.north();
+                        let east = self.east();
+                        let down = self.down();
+                        NorthEastDown::new(north, east, down)
+                    }
+                });
+            } else {
+                components_impl.push(quote! {
+                    /// Converts this type to a [`NorthEastDown`] instance.
+                    pub fn to_ned(&self) -> NorthEastDown<T> where T: Copy + SaturatingNeg<Output = T> {
+                        let north = self.north();
+                        let east = self.east();
+                        let down = self.down();
+                        NorthEastDown::new(north, east, down)
+                    }
+                });
+            }
+
+            // Provide conversion to East, North, Up
+            let up = String::from("up");
+            if variant_name != "EastNorthUp" && components.contains(&east) && components.contains(&north) && components.contains(&up) {
+                components_impl.push(quote! {
+                    /// Converts this type to a [`NorthEastDown`] instance.
+                    pub const fn to_enu(&self) -> EastNorthUp<T> where T: Copy {
+                        let east = self.east();
+                        let north = self.north();
+                        let up = self.up();
+                        EastNorthUp::new(east, north, up)
+                    }
+                });
+            } else {
+                components_impl.push(quote! {
+                    /// Converts this type to a [`EastNorthUp`] instance.
+                    pub fn to_enu(&self) -> EastNorthUp<T> where T: Copy + SaturatingNeg<Output = T> {
+                        let east = self.east();
+                        let north = self.north();
+                        let up = self.up();
+                        EastNorthUp::new(east, north, up)
+                    }
+                });
+            }
+
             quote! {
                 pub struct #variant_name <T>([T; 3]);
 

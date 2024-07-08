@@ -701,6 +701,124 @@ fn process_unit_enum(enum_name: Ident, data_enum: DataEnum) -> TokenStream {
 
                 #(#handedness_impl)*
                 #(#conversion_impl)*
+
+                impl<T> core::ops::Add<T> for #variant_name <T>
+                where
+                    T: core::ops::Add<T, Output = T> + Clone
+                {
+                    type Output = #variant_name <T>;
+
+                    fn add(self, rhs: T) -> Self::Output {
+                        let [x, y, z] = self.0;
+                        Self::new(x + rhs.clone(), y + rhs.clone(), z + rhs)
+                    }
+                }
+
+                impl<T> core::ops::AddAssign<T> for #variant_name <T>
+                where
+                    T: core::ops::AddAssign<T> + Clone
+                {
+                    fn add_assign(&mut self, rhs: T) {
+                        self.0[0] += rhs.clone();
+                        self.0[1] += rhs.clone();
+                        self.0[2] += rhs;
+                    }
+                }
+
+                impl<T> core::ops::Add<#variant_name <T>> for #variant_name <T>
+                where
+                    T: core::ops::Add<T, Output = T> + Clone
+                {
+                    type Output = #variant_name <T>;
+
+                    fn add(self, rhs: #variant_name <T>) -> Self::Output {
+                        let [x, y, z] = self.0;
+                        let [x2, y2, z2] = rhs.0;
+                        Self::new(x + x2, y + y2, z + z2)
+                    }
+                }
+
+                impl<T> core::ops::Sub<T> for #variant_name <T>
+                where
+                    T: core::ops::Sub<T, Output = T> + Clone
+                {
+                    type Output = #variant_name <T>;
+
+                    fn sub(self, rhs: T) -> Self::Output {
+                        let [x, y, z] = self.0;
+                        Self::new(x - rhs.clone(), y - rhs.clone(), z - rhs)
+                    }
+                }
+
+                impl<T> core::ops::SubAssign<T> for #variant_name <T>
+                where
+                    T: core::ops::SubAssign<T> + Clone
+                {
+                    fn sub_assign(&mut self, rhs: T) {
+                        self.0[0] -= rhs.clone();
+                        self.0[1] -= rhs.clone();
+                        self.0[2] -= rhs;
+                    }
+                }
+
+                impl<T> core::ops::Sub<#variant_name <T>> for #variant_name <T>
+                where
+                    T: core::ops::Sub<T, Output = T> + Clone
+                {
+                    type Output = #variant_name <T>;
+
+                    fn sub(self, rhs: #variant_name <T>) -> Self::Output {
+                        let [x, y, z] = self.0;
+                        let [x2, y2, z2] = rhs.0;
+                        Self::new(x - x2, y - y2, z - z2)
+                    }
+                }
+
+                impl<T> core::ops::Mul<T> for #variant_name <T>
+                where
+                    T: core::ops::Mul<T, Output = T> + Clone
+                {
+                    type Output = #variant_name <T>;
+
+                    fn mul(self, rhs: T) -> Self::Output {
+                        let [x, y, z] = self.0;
+                        Self::new(x * rhs.clone(), y * rhs.clone(), z * rhs)
+                    }
+                }
+
+                impl<T> core::ops::MulAssign<T> for #variant_name <T>
+                where
+                    T: core::ops::MulAssign<T> + Clone
+                {
+                    fn mul_assign(&mut self, rhs: T) {
+                        self.0[0] *= rhs.clone();
+                        self.0[1] *= rhs.clone();
+                        self.0[2] *= rhs;
+                    }
+                }
+
+                impl<T> core::ops::Div<T> for #variant_name <T>
+                where
+                    T: core::ops::Div<T, Output = T> + Clone
+                {
+                    type Output = #variant_name <T>;
+
+                    fn div(self, rhs: T) -> Self::Output {
+                        let [x, y, z] = self.0;
+                        Self::new(x / rhs.clone(), y / rhs.clone(), z / rhs)
+                    }
+                }
+
+                impl<T> core::ops::DivAssign<T> for #variant_name <T>
+                where
+                    T: core::ops::DivAssign<T> + Clone
+                {
+                    fn div_assign(&mut self, rhs: T) {
+                        self.0[0] /= rhs.clone();
+                        self.0[1] /= rhs.clone();
+                        self.0[2] /= rhs;
+                    }
+                }
             }
         }
     });

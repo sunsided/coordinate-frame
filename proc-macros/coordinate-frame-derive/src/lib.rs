@@ -1,3 +1,5 @@
+//! Provides the `CoordinateFrame` derive macro.
+
 use proc_macro::TokenStream;
 use quote::{format_ident, quote};
 use syn::{parse_macro_input, Data, DataEnum, DeriveInput, Fields, Ident};
@@ -201,7 +203,38 @@ fn process_unit_enum(enum_name: Ident, data_enum: DataEnum) -> TokenStream {
             let y_doc = format!("For this type, this represents the _{second_component}_ direction.");
             let z_doc = format!("For this type, this represents the _{third_component}_ direction.");
 
+            // Long documentation for the type.
+            let doc_long = format!("# A {}, {} and {} frame", components[0], components[1], components[2]);
+            let handedness = if is_right_handed(&components[0], &components[1], &components[2]) {
+                "right-handed"
+            }  else { "left-handed" };
+            let x_dir_human = axis_direction_human(&components[0]);
+            let y_dir_human = axis_direction_human(&components[1]);
+            let z_dir_human = axis_direction_human(&components[2]);
+
+            let doc_long_second = format!("This resembles a {} coordinate system representing the {}, {} and {} directions, respectively.", handedness,
+                                          x_dir_human, y_dir_human, z_dir_human);
+
+            let x_doc_long = format!("* [`x`](Self::x) represents _{}_, i.e. the {} axis with positive values representing \"{}\".",
+                                     components[0],
+                                     axis_direction(&components[0]),
+                                     x_dir_human);
+            let y_doc_long = format!("* [`y`](Self::y) represents _{}_, i.e. the {} axis with positive values representing \"{}\".",
+                                     components[1],
+                                     axis_direction(&components[1]),
+                                     y_dir_human);
+            let z_doc_long = format!("* [`z`](Self::z) represents _{}_, i.e. the {} axis with positive values representing \"{}\".",
+                                     components[2],
+                                     axis_direction(&components[2]),
+                                     z_dir_human);
+
             quote! {
+                #[doc = #doc_long]
+                #[doc = #doc_long_second]
+                /// ## Axis descriptions
+                #[doc = #x_doc_long]
+                #[doc = #y_doc_long]
+                #[doc = #z_doc_long]
                 pub struct #variant_name <T>([T; 3]);
 
                 impl<T> #variant_name <T> {
@@ -432,4 +465,64 @@ fn split_variant_name_into_components(input: &str) -> [String; 3] {
     components
         .try_into()
         .expect("Expected exactly three components")
+}
+
+fn axis_direction(axis: &str) -> &str {
+    match axis {
+        "east" => "lateral",
+        "west" => "lateral",
+        "north" => "longitudinal",
+        "south" => "longitudinal",
+        "up" => "vertical",
+        "down" => "vertical",
+        _ => unreachable!(),
+    }
+}
+
+fn axis_direction_human(axis: &str) -> &str {
+    match axis {
+        "east" => "right",
+        "west" => "left",
+        "north" => "forward",
+        "south" => "backward",
+        "up" => "up",
+        "down" => "down",
+        _ => unreachable!(),
+    }
+}
+
+fn is_right_handed(first: &str, second: &str, third: &str) -> bool {
+    let first = axis_vec(first);
+    let second = axis_vec(second);
+    let third = axis_vec(third);
+
+    let cross = cross(first, second);
+    vectors_equal(cross, third)
+}
+
+fn cross(a: [f32; 3], b: [f32; 3]) -> [f32; 3] {
+    [
+        a[1] * b[2] - a[2] * b[1],
+        a[2] * b[0] - a[0] * b[2],
+        a[0] * b[1] - a[1] * b[0],
+    ]
+}
+
+fn vectors_equal(v1: [f32; 3], v2: [f32; 3]) -> bool {
+    const EPSILON: f32 = 1e-6;
+    (v1[0] - v2[0]).abs() < EPSILON
+        && (v1[1] - v2[1]).abs() < EPSILON
+        && (v1[2] - v2[2]).abs() < EPSILON
+}
+
+fn axis_vec(axis: &str) -> [f32; 3] {
+    match axis {
+        "north" => [0.0, 1.0, 0.0],
+        "south" => [0.0, -1.0, 0.0],
+        "east" => [1.0, 0.0, 0.0],
+        "west" => [-1.0, 0.0, 0.0],
+        "up" => [0.0, 0.0, 1.0],
+        "down" => [0.0, 0.0, -1.0],
+        _ => unreachable!(),
+    }
 }

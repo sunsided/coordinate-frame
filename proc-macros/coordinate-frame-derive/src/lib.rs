@@ -414,6 +414,37 @@ fn process_unit_enum(enum_name: Ident, data_enum: DataEnum) -> TokenStream {
                         #z_axis_vec
                     }
 
+                    /// Calculates the squared norm of the components.
+                    ///
+                    /// ## Panics
+                    /// This operation may overflow.
+                    pub fn norm_sq(&self) -> T where T: Clone + core::ops::Mul<T, Output = T> + core::ops::Add<T, Output = T> {
+                        let x = self.x().clone();
+                        let y = self.y().clone();
+                        let z = self.z().clone();
+                        x.clone() * x + y.clone() * y + z.clone() * z
+                    }
+
+                    /// Calculates the cross product (outer product) of two coordinates.
+                    ///
+                    /// ## Panics
+                    /// This operation may overflow.
+                    pub fn cross(&self, rhs: &Self) -> Self where T: Clone + core::ops::Mul<T, Output = T> + core::ops::Sub<T, Output = T> {
+                        Self([
+                            self[1].clone() * rhs[2].clone() - self[2].clone() * rhs[1].clone(),
+                            self[2].clone() * rhs[0].clone() - self[0].clone() * rhs[2].clone(),
+                            self[0].clone() * rhs[1].clone() - self[1].clone() * rhs[0].clone()
+                        ])
+                    }
+
+                    /// Calculates the dot product (inner product) of two coordinates.
+                    ///
+                    /// ## Panics
+                    /// This operation may overflow.
+                    pub fn dot(&self, rhs: &Self) -> T where T: Clone + core::ops::Mul<T, Output = T> + core::ops::Add<T, Output = T> {
+                        self[0].clone() * rhs[0].clone() + self[1].clone() * rhs[1].clone() + self[2].clone() * rhs[2].clone()
+                    }
+
                     #(#components_impl)*
                 }
 

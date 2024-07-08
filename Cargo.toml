@@ -1,10 +1,10 @@
 [workspace.package]
 version = "0.1.0"
-description = "Very simpe coordinate frame conversions"
+description = "Very simple coordinate frame conversions"
 authors = ["Markus Mayer <widemeadows@gmail.com>"]
 categories = ["no-std", "no-std::no-alloc"]
 edition = "2021"
-license = "EUPL-1.2"
+license = "EUPL-1.2 OR Apache-2.0 OR MIT"
 rust-version = "1.70.0"
 repository = "https://github.com/sunsided/coordinate-frame"
 homepage = "https://github.com/sunsided/coordinate-frame"

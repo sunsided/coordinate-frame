@@ -6,78 +6,112 @@ mod traits;
 use coordinate_frame_derive::CoordinateFrame;
 pub use traits::*;
 
+/// A coordinate frame type.
 #[derive(CoordinateFrame, Default, Debug, Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash)]
 #[repr(u8)]
 pub enum CoordinateFrameType {
-    /// Aerospace.
+    /// Common aerospace reference frame.
+    /// See [`NorthEastDown`].
     #[default]
     NorthEastDown,
+    /// See [`NorthEastUp`].
     NorthEastUp,
+    /// See [`NorthWestDown`].
     NorthWestDown,
+    /// See [`NorthWestUp`].
     NorthWestUp,
+    /// See [`NorthDownEast`].
     NorthDownEast,
+    /// See [`NorthDownWest`].
     NorthDownWest,
+    /// See [`NorthUpEast`].
     NorthUpEast,
+    /// See [`NorthUpWest`].
     NorthUpWest,
+    /// See [`EastNorthDown`].
     EastNorthDown,
-    /// Geography.
+    /// Common geography reference frame.
+    /// See [`EastNorthUp`].
     EastNorthUp,
+    /// See [`EastSouthDown`].
     EastSouthDown,
+    /// See [`EastSouthUp`].
     EastSouthUp,
+    /// See [`EastDownNorth`].
     EastDownNorth,
+    /// See [`EastDownSouth`].
     EastDownSouth,
+    /// See [`EastUpNorth`].
     EastUpNorth,
+    /// See [`EastUpSouth`].
     EastUpSouth,
+    /// See [`SouthEastDown`].
     SouthEastDown,
+    /// See [`SouthEastUp`].
     SouthEastUp,
+    /// See [`SouthWestDown`].
     SouthWestDown,
+    /// See [`SouthWestUp`].
     SouthWestUp,
+    /// See [`SouthDownEast`].
     SouthDownEast,
+    /// See [`SouthDownWest`].
     SouthDownWest,
+    /// See [`SouthUpEast`].
     SouthUpEast,
+    /// See [`SouthUpWest`].
     SouthUpWest,
+    /// See [`WestNorthDown`].
     WestNorthDown,
+    /// See [`WestNorthUp`].
     WestNorthUp,
+    /// See [`WestSouthDown`].
     WestSouthDown,
+    /// See [`WestSouthUp`].
     WestSouthUp,
+    /// See [`WestDownNorth`].
     WestDownNorth,
+    /// See [`WestDownSouth`].
     WestDownSouth,
+    /// See [`WestUpNorth`].
     WestUpNorth,
+    /// See [`WestUpSouth`].
     WestUpSouth,
+    /// See [`DownNorthEast`].
     DownNorthEast,
+    /// See [`DownNorthWest`].
     DownNorthWest,
+    /// See [`DownEastNorth`].
     DownEastNorth,
+    /// See [`DownEastSouth`].
     DownEastSouth,
+    /// See [`DownSouthEast`].
     DownSouthEast,
+    /// See [`DownSouthWest`].
     DownSouthWest,
+    /// See [`DownWestNorth`].
     DownWestNorth,
+    /// See [`DownWestSouth`].
     DownWestSouth,
+    /// See [`UpNorthEast`].
     UpNorthEast,
+    /// See [`UpNorthWest`].
     UpNorthWest,
+    /// See [`UpEastNorth`].
     UpEastNorth,
+    /// See [`UpEastSouth`].
     UpEastSouth,
+    /// See [`UpSouthEast`].
     UpSouthEast,
+    /// See [`UpSouthWest`].
     UpSouthWest,
+    /// See [`UpWestNorth`].
     UpWestNorth,
+    /// See [`UpWestSouth`].
     UpWestSouth,
     /// An orientation represented by a rotation matrix.
     Other,
 }
-
-/// * **X** represents the longitudinal axis with positive values representing "forward".
-/// * **Y** represents the lateral axis with positive values representing "right".
-/// * **Z** represents the vertical axis with positive values representing "down".
-// pub struct NorthEastDown<T>([T; 3]);
-
-/// * **X** represents the longitudinal axis with positive values representing "forward".
-/// * **Y** represents the lateral axis with positive values representing "right".
-/// * **Z** represents the vertical axis with positive values representing "up".
-// pub struct NorthEastUp<T>([T; 3]);
-
-/// * **X** represents the lateral axis with positive values representing "right".
-/// * **Y** represents the longitudinal axis with positive values representing "forward".
-/// * **Z** represents the vertical axis with positive values representing "up".
-// pub struct EastNorthUp<T>([T; 3]);
 
 #[cfg(test)]
 mod tests {

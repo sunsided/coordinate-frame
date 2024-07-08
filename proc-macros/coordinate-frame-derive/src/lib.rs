@@ -204,7 +204,13 @@ fn process_unit_enum(enum_name: Ident, data_enum: DataEnum) -> TokenStream {
             let z_doc = format!("For this type, this represents the _{third_component}_ direction.");
 
             // Long documentation for the type.
-            let doc_long = format!("# A {}, {} and {} frame", components[0], components[1], components[2]);
+            let mut doc_long = format!("# A {}, {} and {} frame", components[0], components[1], components[2]);
+            if variant_name == "NorthEastDown" {
+                doc_long.push_str(" (aeronautics)");
+            } else if variant_name == "EastNorthUp" {
+                doc_long.push_str(" (geography)");
+            }
+
             let handedness = if is_right_handed(&components[0], &components[1], &components[2]) {
                 "right-handed"
             }  else { "left-handed" };

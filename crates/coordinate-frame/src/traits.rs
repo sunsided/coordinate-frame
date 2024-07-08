@@ -47,6 +47,21 @@ pub trait CoordinateFrame {
 
     /// Indicates whether this coordinate system is right-handed or left-handed.
     fn right_handed(&self) -> bool;
+
+    /// Returns the base vector for the `x` axis in the global frame.
+    fn x_axis() -> [Self::Type; 3]
+    where
+        Self::Type: ZeroOne<Output = Self::Type> + core::ops::Neg<Output = Self::Type>;
+
+    /// Returns the base vector for the `y` axis in the global frame.
+    fn y_axis() -> [Self::Type; 3]
+    where
+        Self::Type: ZeroOne<Output = Self::Type> + core::ops::Neg<Output = Self::Type>;
+
+    /// Returns the base vector for the `z` axis in the global frame.
+    fn z_axis() -> [Self::Type; 3]
+    where
+        Self::Type: ZeroOne<Output = Self::Type> + core::ops::Neg<Output = Self::Type>;
 }
 
 /// Marks a right-handed coordinate system.
@@ -287,7 +302,10 @@ impl ZeroOne for f64 {
 }
 
 #[cfg(feature = "num-traits")]
-impl<T> ZeroOne for T where T: num_traits::Zero + num_traits::One {
+impl<T> ZeroOne for T
+where
+    T: num_traits::Zero + num_traits::One,
+{
     type Output = T;
 
     fn zero() -> Self::Output {

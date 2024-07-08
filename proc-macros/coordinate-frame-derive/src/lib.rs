@@ -1,7 +1,7 @@
 //! Provides the `CoordinateFrame` derive macro.
 
 use proc_macro::TokenStream;
-use quote::{format_ident, quote};
+use quote::{format_ident, quote, ToTokens};
 use syn::{parse_macro_input, Data, DataEnum, DeriveInput, Fields, Ident};
 
 const LATERAL: [&str; 2] = ["east", "west"];
@@ -212,6 +212,11 @@ fn process_unit_enum(enum_name: Ident, data_enum: DataEnum) -> TokenStream {
                 });
             }
 
+            // Base vectors
+            let x_axis_vec = axis_def_t(&components[0]);
+            let y_axis_vec = axis_def_t(&components[1]);
+            let z_axis_vec = axis_def_t(&components[2]);
+
             // Documentation for x, y and z.
             let x_doc = format!("For this type, this represents the _{first_component}_ direction.");
             let y_doc = format!("For this type, this represents the _{second_component}_ direction.");
@@ -324,6 +329,21 @@ fn process_unit_enum(enum_name: Ident, data_enum: DataEnum) -> TokenStream {
                         #right_handed
                     }
 
+                    /// Returns the base vector for the `x` axis in the global frame.
+                    pub fn x_axis() -> [T; 3] where T: ZeroOne<Output = T> + core::ops::Neg<Output = T> {
+                        #x_axis_vec
+                    }
+
+                    /// Returns the base vector for the `y` axis in the global frame.
+                    pub fn y_axis() -> [T; 3] where T: ZeroOne<Output = T> + core::ops::Neg<Output = T> {
+                        #y_axis_vec
+                    }
+
+                    /// Returns the base vector for the `z` axis in the global frame.
+                    pub fn z_axis() -> [T; 3] where T: ZeroOne<Output = T> + core::ops::Neg<Output = T> {
+                        #z_axis_vec
+                    }
+
                     #(#components_impl)*
                 }
 
@@ -391,6 +411,27 @@ fn process_unit_enum(enum_name: Ident, data_enum: DataEnum) -> TokenStream {
                     /// Indicates whether this coordinate system is right-handed or left-handed.
                     fn right_handed(&self) -> bool {
                         self.right_handed()
+                    }
+
+                    /// Returns the base vector for the `x` axis.
+                    #[inline]
+                    #[must_use]
+                    fn x_axis() -> [Self::Type; 3] where Self::Type: ZeroOne<Output = Self::Type> + core::ops::Neg<Output = Self::Type> {
+                        Self::x_axis()
+                    }
+
+                    /// Returns the base vector for the `y` axis.
+                    #[inline]
+                    #[must_use]
+                    fn y_axis() -> [Self::Type; 3] where Self::Type: ZeroOne<Output = Self::Type> + core::ops::Neg<Output = Self::Type> {
+                        Self::y_axis()
+                    }
+
+                    /// Returns the base vector for the `z` axis.
+                    #[inline]
+                    #[must_use]
+                    fn z_axis() -> [Self::Type; 3] where Self::Type: ZeroOne<Output = Self::Type> + core::ops::Neg<Output = Self::Type> {
+                        Self::z_axis()
                     }
                 }
 
@@ -561,6 +602,18 @@ fn axis_vec(axis: &str) -> [f32; 3] {
         "west" => [-1.0, 0.0, 0.0],
         "up" => [0.0, 0.0, 1.0],
         "down" => [0.0, 0.0, -1.0],
+        _ => unreachable!(),
+    }
+}
+
+fn axis_def_t(axis: &str) -> impl ToTokens {
+    match axis {
+        "north" => quote! { [T::zero(), T::one(), T::zero()] },
+        "south" => quote! { [T::zero(), T::one().neg(), T::zero()] },
+        "east" => quote! { [T::one(), T::zero(), T::zero()] },
+        "west" => quote! { [T::one().neg(), T::one(), T::zero()] },
+        "up" => quote! { [T::zero(), T::zero(), T::one()] },
+        "down" => quote! { [T::zero(), T::zero(), T::one().neg()] },
         _ => unreachable!(),
     }
 }

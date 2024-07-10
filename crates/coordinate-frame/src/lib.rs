@@ -230,4 +230,24 @@ mod tests {
         // let str = permutations.join(",");
         assert_eq!(permutations.len(), 48);
     }
+
+    #[test]
+    #[cfg(feature = "nalgebra")]
+    fn nalgebra_from_point3() {
+        let ned = NorthEastDown::from(nalgebra::Point3::new(1.0, 2.0, 3.0)).to_enu();
+        let point: nalgebra::Point3<_> = ned.into();
+        assert_eq!(point.x, 2.0);
+        assert_eq!(point.y, 1.0);
+        assert_eq!(point.z, -3.0);
+    }
+
+    #[test]
+    #[cfg(feature = "nalgebra")]
+    fn nalgebra_from_vector() {
+        let ned = NorthEastDown::from(nalgebra::Vector3::new(1.0, 2.0, 3.0)).to_enu();
+        let point: nalgebra::Vector3<_> = ned.into();
+        assert_eq!(point.x, 2.0);
+        assert_eq!(point.y, 1.0);
+        assert_eq!(point.z, -3.0);
+    }
 }

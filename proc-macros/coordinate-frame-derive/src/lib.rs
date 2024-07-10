@@ -733,6 +733,52 @@ fn process_unit_enum(enum_name: Ident, data_enum: DataEnum) -> TokenStream {
                 #(#handedness_impl)*
                 #(#conversion_impl)*
 
+                #[cfg(feature = "nalgebra")]
+                #[cfg_attr(docsrs, doc(cfg(feature = "nalgebra")))]
+                impl<T> core::convert::From<nalgebra::Point3<T>> for #variant_name <T>
+                where
+                    T: nalgebra::Scalar + Copy
+                {
+                    fn from(value: nalgebra::Point3<T>) -> #variant_name <T> {
+                        Self::new(value.x, value.y, value.z)
+                    }
+                }
+
+                #[cfg(feature = "nalgebra")]
+                #[cfg_attr(docsrs, doc(cfg(feature = "nalgebra")))]
+                impl<T> core::convert::From<#variant_name <T>> for nalgebra::Point3<T>
+                where
+                    T: nalgebra::Scalar
+                {
+                    fn from(value: #variant_name <T>) -> nalgebra::Point3<T> {
+                        let [x, y, z] = value.0;
+                        Self::new(x, y, z)
+                    }
+                }
+
+                #[cfg(feature = "nalgebra")]
+                #[cfg_attr(docsrs, doc(cfg(feature = "nalgebra")))]
+                impl<T> core::convert::From<nalgebra::Vector3<T>> for #variant_name <T>
+                where
+                    T: nalgebra::Scalar + Copy
+                {
+                    fn from(value: nalgebra::Vector3<T>) -> #variant_name <T> {
+                        Self::new(value.x, value.y, value.z)
+                    }
+                }
+
+                #[cfg(feature = "nalgebra")]
+                #[cfg_attr(docsrs, doc(cfg(feature = "nalgebra")))]
+                impl<T> core::convert::From<#variant_name <T>> for nalgebra::Vector3<T>
+                where
+                    T: nalgebra::Scalar
+                {
+                    fn from(value: #variant_name <T>) -> nalgebra::Vector3<T> {
+                        let [x, y, z] = value.0;
+                        Self::new(x, y, z)
+                    }
+                }
+
                 impl<T> core::ops::Add<T> for #variant_name <T>
                 where
                     T: core::ops::Add<T, Output = T> + Clone

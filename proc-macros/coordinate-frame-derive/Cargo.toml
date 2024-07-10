@@ -16,6 +16,9 @@ proc-macro = true
 
 [features]
 std = []
+micromath = []
+nalgebra = []
+defmt = []
 
 [dependencies]
 quote = "1.0.36"

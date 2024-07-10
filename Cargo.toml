@@ -1,5 +1,5 @@
 [workspace.package]
-version = "0.3.0"
+version = "0.3.1"
 description = "Very simple coordinate frame conversions"
 authors = ["Markus Mayer <widemeadows@gmail.com>"]
 categories = ["no-std", "no-std::no-alloc"]

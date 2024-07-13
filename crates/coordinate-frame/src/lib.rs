@@ -161,7 +161,7 @@ pub enum ParseCoordinateFrameError {
 
 #[cfg(test)]
 mod tests {
-    use crate::{EastNorthUp, NorthEastDown, NorthEastUp};
+    use crate::{EastNorthUp, NorthEastDown, NorthEastUp, SouthWestUp};
 
     #[test]
     fn neu_to_ned() {
@@ -194,9 +194,16 @@ mod tests {
 
     #[test]
     fn ned_to_enu() {
-        let neu = NorthEastDown([1.0, 2.0, 3.0]);
-        let enu: EastNorthUp<_> = neu.into();
+        let ned = NorthEastDown([1.0, 2.0, 3.0]);
+        let enu: EastNorthUp<_> = ned.into();
         assert_eq!(enu.0, [2.0, 1.0, -3.0]);
+    }
+
+    #[test]
+    fn flip() {
+        let ned = NorthEastDown([1.0, 2.0, 3.0]);
+        let swu: SouthWestUp<_> = ned.flip_frame();
+        assert_eq!(swu.0, [-1.0, -2.0, -3.0]);
     }
 
     #[test]

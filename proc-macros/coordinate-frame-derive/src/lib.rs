@@ -108,9 +108,11 @@ fn process_unit_enum(enum_name: Ident, data_enum: DataEnum) -> TokenStream {
             }
 
             // Generate derived pairs.
+            let mut opposing_direction = Vec::new();
             for component  in components.iter() {
                 let pair = MUTUALLY_EXCLUSIVE.iter().copied().find(|&pair| pair.contains(&component.as_str())).expect("Failed to identify component pair");
                 let other = pair.iter().copied().find(|&other| !other.eq(component.as_str())).expect("Failed to find component's opposite direction");
+                opposing_direction.push(other);
 
                 let component_name = format_ident!("{component}");
                 let clone_component_name = format_ident!("{component}_clone");
@@ -133,6 +135,21 @@ fn process_unit_enum(enum_name: Ident, data_enum: DataEnum) -> TokenStream {
                     }
                 });
             }
+
+            // Create flipped version.
+            let flipped_name = String::from_iter(opposing_direction.iter().map(|component| capitalize(component)));
+            let flipped_ident = format_ident!("{}", flipped_name);
+            let flip_doc = format!("Flips this coordinate frame into its opposite frame, [`{flipped_name}`]");
+            components_impl.push(quote! {
+                #[doc = #flip_doc]
+                #[inline]
+                pub fn flip_frame(&self) -> #flipped_ident <T>
+                where
+                    T: Copy + SaturatingNeg<Output = T>
+                {
+                    (*self).into()
+                }
+            });
 
             // Create constructor.
             let first_component = format_ident!("{}", &components[0]);
@@ -1088,6 +1105,18 @@ fn axis_def_t(axis: &str) -> impl ToTokens {
         "west" => quote! { [T::one().neg(), T::one(), T::zero()] },
         "up" => quote! { [T::zero(), T::zero(), T::one()] },
         "down" => quote! { [T::zero(), T::zero(), T::one().neg()] },
+        _ => unreachable!(),
+    }
+}
+
+fn capitalize(axis: &str) -> &str {
+    match axis {
+        "north" => "North",
+        "south" => "South",
+        "east" => "East",
+        "west" => "West",
+        "up" => "Up",
+        "down" => "Down",
         _ => unreachable!(),
     }
 }

@@ -29,7 +29,7 @@ fn example() {
 
     // Note that "non-native" axes are also available.
     assert_eq!(neu.down(), -3.0);
-  
+
     // You can transform it into a different frame.
     let ned: NorthEastDown<_> = neu.into();
     assert_eq!(ned.north(), 1.0);
@@ -40,10 +40,6 @@ fn example() {
     assert_eq!(ned, &[1.0, 2.0, -3.0]);
     assert_eq!(ned.x(), 1.0);
     assert_eq!(ned.z(), -3.0);
-
-    // Base vectors are also provided.
-    let axis = NorthEastDown::<f64>::z_axis();
-    assert_eq!(axis, [0.0, 0.0, -1.0]);
 }
 ```
 

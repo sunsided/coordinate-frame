@@ -1126,3 +1126,111 @@ fn capitalize(axis: &str) -> &str {
         _ => unreachable!(),
     }
 }
+
+fn up_west_south(up: &str, south: &str, west: &str) -> String {
+    format!(
+        r#"        {up}
+        |
+        |
+        |
+{west} ______|
+       /
+      /
+     /
+    {south}
+"#
+    )
+}
+
+fn up_east_south(up: &str, south: &str, east: &str) -> String {
+    format!(
+        r#"    {up}
+    |
+    |
+    |
+    |______ {east}
+   /
+  /
+ /
+{south}
+"#
+    )
+}
+
+fn up_east_north(up: &str, north: &str, east: &str) -> String {
+    format!(
+        r#"{up}
+|   {north}
+|  /
+| /
+|/______ {east}
+"#
+    )
+}
+
+fn up_west_north(up: &str, north: &str, west: &str) -> String {
+    format!(
+        r#"        {up}
+        |   {north}
+        |  /
+        | /
+{west} ______|/
+"#
+    )
+}
+
+fn down_west_south(down: &str, south: &str, west: &str) -> String {
+    // TODO
+    format!(
+        r#"        {down}
+        |
+        |
+        |
+{west} ______|
+       /
+      /
+     /
+    {south}
+"#
+    )
+}
+
+fn down_east_south(down: &str, south: &str, east: &str) -> String {
+    // TODO
+    format!(
+        r#"    {down}
+    |
+    |
+    |
+    |______ {east}
+   /
+  /
+ /
+{south}
+"#
+    )
+}
+
+fn down_east_north(down: &str, north: &str, east: &str) -> String {
+    // TODO
+    format!(
+        r#"{down}
+|   {north}
+|  /
+| /
+|/______ {east}
+"#
+    )
+}
+
+fn down_west_north(down: &str, north: &str, west: &str) -> String {
+    // TODO
+    format!(
+        r#"        {down}
+        |   {north}
+        |  /
+        | /
+{west} ______|/
+"#
+    )
+}

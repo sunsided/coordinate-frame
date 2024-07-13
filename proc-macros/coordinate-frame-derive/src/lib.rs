@@ -292,6 +292,7 @@ fn process_unit_enum(enum_name: Ident, data_enum: DataEnum) -> TokenStream {
                 #[doc = #y_doc_long]
                 #[doc = #z_doc_long]
                 #[derive(Debug, Copy, Clone, Eq, PartialEq, Ord, PartialOrd)]
+                #[repr(C)]
                 pub struct #variant_name <T>([T; 3]);
 
                 impl<T> core::fmt::Display for #variant_name <T> where T: core::fmt::Display {

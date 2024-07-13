@@ -259,9 +259,9 @@ fn process_unit_enum(enum_name: Ident, data_enum: DataEnum) -> TokenStream {
             let z_axis_vec = axis_def_t(&components[2]);
 
             // Documentation for x, y and z.
-            let x_doc = format!("For this type, this represents the _{first_component}_ direction.");
-            let y_doc = format!("For this type, this represents the _{second_component}_ direction.");
-            let z_doc = format!("For this type, this represents the _{third_component}_ direction.");
+            let x_doc = format!("For this type, this represents the [`{first_component}`](Self::{first_component}) direction.");
+            let y_doc = format!("For this type, this represents the [`{second_component}`](Self::{second_component}) direction.");
+            let z_doc = format!("For this type, this represents the [`{third_component}`](Self::{third_component}) direction.");
 
             // Long documentation for the type.
             let handedness = if right_handed {
@@ -288,15 +288,18 @@ fn process_unit_enum(enum_name: Ident, data_enum: DataEnum) -> TokenStream {
             let doc_long_second = format!("This resembles a {handedness_emoji} {} coordinate system representing the {}, {} and {} directions, respectively.", handedness,
                                           x_dir_human, y_dir_human, z_dir_human);
 
-            let x_doc_long = format!("* [`x`](Self::x) represents _{}_, i.e. the {} axis with positive values representing \"{}\".",
+            let x_doc_long = format!("* [`x`](Self::x) represents [`{}`](Self::{}), i.e. the {} axis with positive values representing \"{}\".",
+                                     components[0],
                                      components[0],
                                      axis_direction(&components[0]),
                                      x_dir_human);
-            let y_doc_long = format!("* [`y`](Self::y) represents _{}_, i.e. the {} axis with positive values representing \"{}\".",
+            let y_doc_long = format!("* [`y`](Self::y) represents [`{}`](Self::{}), i.e. the {} axis with positive values representing \"{}\".",
+                                     components[1],
                                      components[1],
                                      axis_direction(&components[1]),
                                      y_dir_human);
-            let z_doc_long = format!("* [`z`](Self::z) represents _{}_, i.e. the {} axis with positive values representing \"{}\".",
+            let z_doc_long = format!("* [`z`](Self::z) represents [`{}`](Self::{}), i.e. the {} axis with positive values representing \"{}\".",
+                                     components[2],
                                      components[2],
                                      axis_direction(&components[2]),
                                      z_dir_human);

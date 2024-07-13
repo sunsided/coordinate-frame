@@ -568,6 +568,12 @@ fn process_unit_enum(enum_name: Ident, data_enum: DataEnum) -> TokenStream {
                     }
                 }
 
+                impl<T> From<[T; 3]> for #variant_name <T> {
+                    fn from(value: [T; 3]) -> #variant_name <T> {
+                        #variant_name (value)
+                    }
+                }
+
                 #[cfg(feature = "micromath")]
                 #[cfg_attr(docsrs, doc(cfg(feature = "micromath")))]
                 impl From<micromath::vector::F32x3> for #variant_name <f32> {

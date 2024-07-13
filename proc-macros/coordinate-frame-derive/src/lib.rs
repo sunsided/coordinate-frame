@@ -327,8 +327,26 @@ fn process_unit_enum(enum_name: Ident, data_enum: DataEnum) -> TokenStream {
                     }
 
                     /// Constructs an instance from an array.
+                    ///
+                    /// Be mindful not to directly pass a different coordinate frame into
+                    /// this function unless you want to strictly re-interpret the values.
                     pub const fn from_array(vec: [T; 3]) -> Self {
                         Self(vec)
+                    }
+
+                    /// Constructs an instance from a slice.
+                    ///
+                    /// Be mindful not to directly pass a different coordinate frame into
+                    /// this function unless you want to strictly re-interpret the values.
+                    pub fn from_slice(vec: &[T]) -> Self
+                    where
+                        T: Clone
+                    {
+                        assert_eq!(vec.len(), 3, "The provided slice must have length 3");
+                        let z = vec[2].clone();
+                        let y = vec[1].clone();
+                        let x = vec[0].clone();
+                        Self([x, y, z])
                     }
 
                     /// Gets the value of the first dimension.

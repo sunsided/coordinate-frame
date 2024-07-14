@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 This project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased
+
+### Added
+
+- Added the `construct_frame` function to construct a coordinate frame from values and a `CoordinateFrameType` variant.
+- Added the `new_from` function to a coordinate frame to simplify access to `construct_frame`.
+
 ## [0.5.0] - 2024-07-14
 
 [0.5.0]: https://github.com/sunsided/coordinate-frame/releases/tag/v0.5.0

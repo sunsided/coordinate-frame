@@ -169,7 +169,7 @@ pub enum ParseCoordinateFrameError {
 
 #[cfg(test)]
 mod tests {
-    use crate::{EastNorthUp, NorthEastDown, NorthEastUp, SouthWestUp};
+    use crate::*;
 
     #[test]
     fn neu_to_ned() {
@@ -213,6 +213,15 @@ mod tests {
         assert_eq!(ned2.north(), 2.0);
         assert_eq!(ned2.east(), 4.0);
         assert_eq!(ned2.down(), -6.0);
+    }
+
+    #[test]
+    fn construct() {
+        let ned = NorthEastDown::new_from(CoordinateFrameType::SouthWestUp, 1.0, 2.0, 3.0)
+            .expect("invalid conversion");
+        assert_eq!(ned.north(), -1.0);
+        assert_eq!(ned.east(), -2.0);
+        assert_eq!(ned.down(), -3.0);
     }
 
     #[test]

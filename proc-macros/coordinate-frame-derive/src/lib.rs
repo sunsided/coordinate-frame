@@ -26,6 +26,7 @@ fn process_unit_enum(enum_name: Ident, data_enum: DataEnum) -> TokenStream {
     let mut parse_u8_arms = Vec::new();
     let mut defmt_arms = Vec::new();
     let mut display_arms = Vec::new();
+    let mut convert_arms = Vec::new();
 
     let impls = data_enum.variants.iter().map(|variant| {
         let variant_name = &variant.ident;
@@ -54,6 +55,10 @@ fn process_unit_enum(enum_name: Ident, data_enum: DataEnum) -> TokenStream {
         if variant_name == "Other" || variant_name == "Undefined" {
             quote! {}
         } else {
+            convert_arms.push(quote! {
+                #enum_name :: #variant_name  => #variant_name :: new(x, y, z).to_ned().into(),
+            });
+
             let components = split_variant_name_into_components(&variant_name.to_string());
 
             // Implementations for each component.
@@ -377,6 +382,15 @@ fn process_unit_enum(enum_name: Ident, data_enum: DataEnum) -> TokenStream {
                     #[doc = #new_doc]
                     pub const fn new(#first_component: T, #second_component: T, #third_component: T) -> Self {
                         Self([#first_component, #second_component, #third_component])
+                    }
+
+                    /// Constructs a new instance from values in the specified coordinate frame.
+                    /// See the [`construct_frame`] function for more information.
+                    pub fn new_from(frame: CoordinateFrameType, x: T, y: T, z: T) -> Option<Self>
+                    where
+                        T: Copy + SaturatingNeg<Output = T>
+                    {
+                        construct_frame(frame, x, y, z)
                     }
 
                     /// Constructs an instance from an array.
@@ -1035,6 +1049,29 @@ fn process_unit_enum(enum_name: Ident, data_enum: DataEnum) -> TokenStream {
                     #(#defmt_arms)*
                 }
             }
+        }
+
+        /// Constructs a coordinate frame from the specified type and its component values.
+        ///
+        /// ## Arguments
+        /// * `system` - The coordinate frame type the coordinates are in.
+        /// * `x` - The value along the x-axis in the specified system.
+        /// * `y` - The value along the y-axis in the specified system.
+        /// * `z` - The value along the z-axis in the specified system.
+        ///
+        /// ## Returns
+        /// This function generally returns `Some(frame)`. If unspecified coordinate systems
+        /// such as [`Other`](CoordianteFrameType::Other) or [`Undefined`](CoordianteFrameType::Undefined)
+        /// are passed, the function returns `None`.
+        pub fn construct_frame<T, Out>(system: CoordinateFrameType, x: T, y: T, z: T) -> Option<Out>
+        where
+            Out: CoordinateFrame<Type = T> + From<NorthEastDown<T>>,
+            T: Copy + SaturatingNeg<Output = T>,
+        {
+            Some(match system {
+                #(#convert_arms)*
+                _ => return None
+            })
         }
     };
     TokenStream::from(expanded)

@@ -15,7 +15,7 @@ This project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 - The `x`, `y` and `z` functions of each type are now linked up with their respective directions
   in the documentation
-- The base vector functions are now marked deprecated as they are ambiguous with respect to their reference frame.
+- The base vector functions now return the primary axes in their own coordinate frame.
 
 ## [0.4.0] - 2024-07-13
 

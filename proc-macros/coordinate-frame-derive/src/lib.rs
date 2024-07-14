@@ -474,20 +474,17 @@ fn process_unit_enum(enum_name: Ident, data_enum: DataEnum) -> TokenStream {
                         #right_handed
                     }
 
-                    /// Returns the base vector for the `x` axis in the global frame.
-                    #[deprecated(since = "0.4.0", note="This method is ambiguous regarding its reference frame.")]
+                    /// Returns the base vector for the `x` axis in the local frame.
                     pub fn x_axis() -> [T; 3] where T: ZeroOne<Output = T> + core::ops::Neg<Output = T> {
                         #x_axis_vec
                     }
 
-                    /// Returns the base vector for the `y` axis in the global frame.
-                    #[deprecated(since = "0.4.0", note="This method is ambiguous regarding its reference frame.")]
+                    /// Returns the base vector for the `y` axis in the local frame.
                     pub fn y_axis() -> [T; 3] where T: ZeroOne<Output = T> + core::ops::Neg<Output = T> {
                         #y_axis_vec
                     }
 
-                    /// Returns the base vector for the `z` axis in the global frame.
-                    #[deprecated(since = "0.4.0", note="This method is ambiguous regarding its reference frame.")]
+                    /// Returns the base vector for the `z` axis in the local frame.
                     pub fn z_axis() -> [T; 3] where T: ZeroOne<Output = T> + core::ops::Neg<Output = T> {
                         #z_axis_vec
                     }
@@ -1142,11 +1139,11 @@ fn axis_vec(axis: &str) -> [f32; 3] {
 fn axis_def_t(axis: &str) -> impl ToTokens {
     match axis {
         "north" => quote! { [T::zero(), T::one(), T::zero()] },
-        "south" => quote! { [T::zero(), T::one().neg(), T::zero()] },
+        "south" => quote! { [T::zero(), T::one(), T::zero()] },
         "east" => quote! { [T::one(), T::zero(), T::zero()] },
-        "west" => quote! { [T::one().neg(), T::one(), T::zero()] },
+        "west" => quote! { [T::one(), T::zero(), T::zero()] },
         "up" => quote! { [T::zero(), T::zero(), T::one()] },
-        "down" => quote! { [T::zero(), T::zero(), T::one().neg()] },
+        "down" => quote! { [T::zero(), T::zero(), T::one()] },
         _ => unreachable!(),
     }
 }

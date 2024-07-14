@@ -197,7 +197,7 @@ mod tests {
         assert_eq!(ned.z(), -3.0);
 
         let axis = NorthEastDown::<f64>::z_axis();
-        assert_eq!(axis, [0.0, 0.0, -1.0]);
+        assert_eq!(axis, [0.0, 0.0, 1.0]);
     }
 
     #[test]

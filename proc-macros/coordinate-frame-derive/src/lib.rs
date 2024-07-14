@@ -1159,15 +1159,15 @@ fn capitalize(axis: &str) -> &str {
 
 fn up_west_south(up: &str, south: &str, west: &str) -> String {
     format!(
-        r#"        {up} (up)
-        |
-        |
-        |
-{west} ______|
-       /
-      /
-     /
-    {south} (south)
+        r#"           {up} (up)
+           |
+           |
+           |
+   {west} ______|
+(west)    /
+         /
+        /
+       {south} (south)
 "#
     )
 }

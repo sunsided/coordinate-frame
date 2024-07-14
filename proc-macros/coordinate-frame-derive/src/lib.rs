@@ -1200,23 +1200,23 @@ fn up_east_north(up: &str, north: &str, east: &str) -> String {
 
 fn up_west_north(up: &str, north: &str, west: &str) -> String {
     format!(
-        r#"        {up} (up)
-        |   {north} (north)
-        |  /
-        | /
-{west} ______|/
-"#
+        r#"           {up} (up)
+           |   {north} (north)
+           |  /
+           | /
+   {west} ______|/
+(west)"#
     )
 }
 
 fn down_west_south(down: &str, south: &str, west: &str) -> String {
     format!(
-        r#"{west} ______
-       /|
-      / |
-     /  |
-    {south}   {down} (down)
- (south)"#
+        r#"   {west} ______
+(west)    /|
+         / |
+        /  |
+       {south}   {down} (down)
+    (south)"#
     )
 }
 

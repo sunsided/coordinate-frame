@@ -217,9 +217,8 @@ mod tests {
 
     #[test]
     fn construct() {
-        let ned: NorthEastDown<_> =
-            construct_frame(CoordinateFrameType::SouthWestUp, 1.0, 2.0, 3.0)
-                .expect("invalid conversion");
+        let ned = NorthEastDown::new_from(CoordinateFrameType::SouthWestUp, 1.0, 2.0, 3.0)
+            .expect("invalid conversion");
         assert_eq!(ned.north(), -1.0);
         assert_eq!(ned.east(), -2.0);
         assert_eq!(ned.down(), -3.0);

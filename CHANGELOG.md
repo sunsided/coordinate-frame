@@ -8,6 +8,7 @@ This project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Added
 
 - Added the `construct_frame` function to construct a coordinate frame from values and a `CoordinateFrameType` variant.
+- Added the `new_from` function to a coordinate frame to simplify access to `construct_frame`.
 
 ## [0.5.0] - 2024-07-14
 

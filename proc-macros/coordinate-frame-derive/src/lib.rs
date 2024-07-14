@@ -384,6 +384,15 @@ fn process_unit_enum(enum_name: Ident, data_enum: DataEnum) -> TokenStream {
                         Self([#first_component, #second_component, #third_component])
                     }
 
+                    /// Constructs a new instance from values in the specified coordinate frame.
+                    /// See the [`construct_frame`] function for more information.
+                    pub fn new_from(frame: CoordinateFrameType, x: T, y: T, z: T) -> Option<Self>
+                    where
+                        T: Copy + SaturatingNeg<Output = T>
+                    {
+                        construct_frame(frame, x, y, z)
+                    }
+
                     /// Constructs an instance from an array.
                     ///
                     /// Be mindful not to directly pass a different coordinate frame into

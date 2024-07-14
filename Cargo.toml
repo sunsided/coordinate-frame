@@ -1,8 +1,9 @@
 [workspace.package]
-version = "0.4.1"
+version = "0.5.0"
 description = "Very simple coordinate frame conversions"
 authors = ["Markus Mayer <widemeadows@gmail.com>"]
 categories = ["no-std", "no-std::no-alloc"]
+keywords = ["coordinate-system", "orientation", "transformation", "sensor-fusion"]
 edition = "2021"
 license = "EUPL-1.2 OR Apache-2.0 OR MIT"
 rust-version = "1.70.0"

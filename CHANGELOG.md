@@ -3,13 +3,16 @@
 All notable changes to this project will be documented in this file.
 This project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## [0.5.0] - 2024-07-14
+
+[0.5.0]: https://github.com/sunsided/coordinate-frame/releases/tag/v0.5.0
 
 ### Added
 
 - The `COORDINATE_FRAME` constant is now public.
 - The documentation was improved with some visualizations about the coordinate system layouts.
 - The `coordinate_frame` is now available without the `CoordinateFrame` trait.
+- Added the `map` function to apply a transformation to each value of the coordinate system.
 
 ### Changed
 

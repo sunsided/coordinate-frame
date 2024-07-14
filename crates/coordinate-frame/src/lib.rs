@@ -32,7 +32,7 @@
 //!
 //! // Base vectors are also provided.
 //! let axis = NorthEastDown::<f64>::z_axis();
-//! assert_eq!(axis, [0.0, 0.0, -1.0]);
+//! assert_eq!(axis, [0.0, 0.0, 1.0]);
 //! ```
 
 #![cfg_attr(not(feature = "std"), no_std)]
@@ -198,6 +198,21 @@ mod tests {
 
         let axis = NorthEastDown::<f64>::z_axis();
         assert_eq!(axis, [0.0, 0.0, 1.0]);
+
+        // map
+        let ned2 = ned.map(|x| x * 2.0);
+        assert_eq!(ned2.north(), 2.0);
+        assert_eq!(ned2.east(), 4.0);
+        assert_eq!(ned2.down(), -6.0);
+    }
+
+    #[test]
+    fn map() {
+        let ned = NorthEastDown::new(1.0, 2.0, -3.0);
+        let ned2 = ned.map(|x| x * 2.0);
+        assert_eq!(ned2.north(), 2.0);
+        assert_eq!(ned2.east(), 4.0);
+        assert_eq!(ned2.down(), -6.0);
     }
 
     #[test]

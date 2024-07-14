@@ -520,6 +520,18 @@ fn process_unit_enum(enum_name: Ident, data_enum: DataEnum) -> TokenStream {
                         self[0].clone() * rhs[0].clone() + self[1].clone() * rhs[1].clone() + self[2].clone() * rhs[2].clone()
                     }
 
+                    /// Applies a mapping function to each component.
+                    pub fn map<F>(&self, mut map: F) -> Self
+                    where
+                        F: FnMut(T) -> T,
+                        T: Clone
+                    {
+                        let x = map(self.x());
+                        let y = map(self.y());
+                        let z = map(self.z());
+                        Self::new(x, y, z)
+                    }
+
                     #(#components_impl)*
                 }
 

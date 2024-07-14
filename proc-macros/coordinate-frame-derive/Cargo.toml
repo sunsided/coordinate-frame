@@ -4,6 +4,7 @@ description.workspace = true
 version.workspace = true
 authors.workspace = true
 categories.workspace = true
+keywords = ["derive-macro"]
 edition.workspace = true
 license.workspace = true
 repository.workspace = true

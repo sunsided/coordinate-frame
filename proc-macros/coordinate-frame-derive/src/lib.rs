@@ -254,6 +254,7 @@ fn process_unit_enum(enum_name: Ident, data_enum: DataEnum) -> TokenStream {
             }
 
             // Base vectors
+            // TODO: Remove, ambiguous
             let x_axis_vec = axis_def_t(&components[0]);
             let y_axis_vec = axis_def_t(&components[1]);
             let z_axis_vec = axis_def_t(&components[2]);
@@ -304,6 +305,34 @@ fn process_unit_enum(enum_name: Ident, data_enum: DataEnum) -> TokenStream {
                                      axis_direction(&components[2]),
                                      z_dir_human);
 
+            // ASCII art
+            let (up_down, up_down_axis) = if VERTICAL.contains(&components[0].as_str()) {
+                (&components[0], "x")
+            } else if VERTICAL.contains(&components[1].as_str()) {
+                (&components[1], "y")
+            } else {
+                (&components[2], "z")
+            };
+            let (north_south, north_south_axis) = if LONGITUDINAL.contains(&components[0].as_str()) {
+                (&components[0], "x")
+            } else if LONGITUDINAL.contains(&components[1].as_str()) {
+                (&components[1], "y")
+            } else {
+                (&components[2], "z")
+            };
+            let (east_west, east_west_axis) = if LATERAL.contains(&components[0].as_str()) {
+                (&components[0], "x")
+            } else if LATERAL.contains(&components[1].as_str()) {
+                (&components[1], "y")
+            } else {
+                (&components[2], "z")
+            };
+
+            let ascii = ascii_art(up_down, north_south, east_west, up_down_axis, north_south_axis, east_west_axis);
+            let ascii_art_doc = format!(r#"```plain
+{ascii}
+```"#);
+
             quote! {
                 #[doc = #doc_long]
                 #[doc = #doc_long_second]
@@ -311,6 +340,7 @@ fn process_unit_enum(enum_name: Ident, data_enum: DataEnum) -> TokenStream {
                 #[doc = #x_doc_long]
                 #[doc = #y_doc_long]
                 #[doc = #z_doc_long]
+                #[doc = #ascii_art_doc]
                 #[derive(Debug, Copy, Clone, Eq, PartialEq, Ord, PartialOrd)]
                 #[repr(C)]
                 pub struct #variant_name <T>([T; 3]);
@@ -1129,7 +1159,7 @@ fn capitalize(axis: &str) -> &str {
 
 fn up_west_south(up: &str, south: &str, west: &str) -> String {
     format!(
-        r#"        {up}
+        r#"        {up} (up)
         |
         |
         |
@@ -1137,41 +1167,41 @@ fn up_west_south(up: &str, south: &str, west: &str) -> String {
        /
       /
      /
-    {south}
+    {south} (south)
 "#
     )
 }
 
 fn up_east_south(up: &str, south: &str, east: &str) -> String {
     format!(
-        r#"    {up}
+        r#"    {up} (up)
     |
     |
     |
-    |______ {east}
+    |______ {east} (east)
    /
   /
  /
-{south}
+{south} (south)
 "#
     )
 }
 
 fn up_east_north(up: &str, north: &str, east: &str) -> String {
     format!(
-        r#"{up}
-|   {north}
+        r#"{up} (up)
+|   {north} (north)
 |  /
 | /
-|/______ {east}
+|/______ {east} (east)
 "#
     )
 }
 
 fn up_west_north(up: &str, north: &str, west: &str) -> String {
     format!(
-        r#"        {up}
-        |   {north}
+        r#"        {up} (up)
+        |   {north} (north)
         |  /
         | /
 {west} ______|/
@@ -1180,57 +1210,91 @@ fn up_west_north(up: &str, north: &str, west: &str) -> String {
 }
 
 fn down_west_south(down: &str, south: &str, west: &str) -> String {
-    // TODO
     format!(
-        r#"        {down}
-        |
-        |
-        |
-{west} ______|
-       /
-      /
-     /
-    {south}
-"#
+        r#"{west} ______
+       /|
+      / |
+     /  |
+    {south}   {down} (down)
+ (south)"#
     )
 }
 
 fn down_east_south(down: &str, south: &str, east: &str) -> String {
-    // TODO
     format!(
-        r#"    {down}
-    |
-    |
-    |
-    |______ {east}
-   /
-  /
- /
-{south}
-"#
+        r#"        ______ {east} (east)
+      /|
+     / |
+    /  |
+   {south}   {down} (down)
+(south)"#
     )
 }
 
 fn down_east_north(down: &str, north: &str, east: &str) -> String {
-    // TODO
     format!(
-        r#"{down}
-|   {north}
-|  /
-| /
-|/______ {east}
-"#
+        r#"    {north} (north)
+   /
+  /
+ /______ {east} (east)
+|
+|
+|
+|
+{down} (down)"#
     )
 }
 
 fn down_west_north(down: &str, north: &str, west: &str) -> String {
-    // TODO
     format!(
-        r#"        {down}
-        |   {north}
-        |  /
-        | /
-{west} ______|/
+        r#"            {north} (north)
+           /
+          /
+{west} ______ /
+(west)  |
+        |
+        |
+        |
+        {down} (down)
 "#
     )
+}
+
+fn ascii_art(
+    up_down: &str,
+    north_south: &str,
+    east_west: &str,
+    up_down_axis: &str,
+    north_south_axis: &str,
+    east_west_axis: &str,
+) -> String {
+    match up_down {
+        "up" => match north_south {
+            "north" => match east_west {
+                "east" => up_east_north(up_down_axis, north_south_axis, east_west_axis),
+                "west" => up_west_north(up_down_axis, north_south_axis, east_west_axis),
+                _ => unreachable!(),
+            },
+            "south" => match east_west {
+                "east" => up_east_south(up_down_axis, north_south_axis, east_west_axis),
+                "west" => up_west_south(up_down_axis, north_south_axis, east_west_axis),
+                _ => unreachable!(),
+            },
+            _ => unreachable!(),
+        },
+        "down" => match north_south {
+            "north" => match east_west {
+                "east" => down_east_north(up_down_axis, north_south_axis, east_west_axis),
+                "west" => down_west_north(up_down_axis, north_south_axis, east_west_axis),
+                _ => unreachable!(),
+            },
+            "south" => match east_west {
+                "east" => down_east_south(up_down_axis, north_south_axis, east_west_axis),
+                "west" => down_west_south(up_down_axis, north_south_axis, east_west_axis),
+                _ => unreachable!(),
+            },
+            _ => unreachable!(),
+        },
+        _ => unreachable!(),
+    }
 }

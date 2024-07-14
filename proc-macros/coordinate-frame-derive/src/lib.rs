@@ -286,8 +286,11 @@ fn process_unit_enum(enum_name: Ident, data_enum: DataEnum) -> TokenStream {
             let y_dir_human = axis_direction_human(&components[1]);
             let z_dir_human = axis_direction_human(&components[2]);
 
-            let doc_long_second = format!("This resembles a {handedness_emoji} {} coordinate system representing the {}, {} and {} directions, respectively.", handedness,
-                                          x_dir_human, y_dir_human, z_dir_human);
+            let doc_long_second = format!("This resembles a {handedness_emoji} {} coordinate system representing the {}, {} and {} directions, respectively.\n\nIt is encoded by [`CoordinateFrameType::{variant_name}`](CoordinateFrameType::{variant_name}).",
+                                          handedness,
+                                          x_dir_human,
+                                          y_dir_human,
+                                          z_dir_human);
 
             let x_doc_long = format!("* [`x`](Self::x) represents [`{}`](Self::{}), i.e. the {} axis with positive values representing \"{}\".",
                                      components[0],
@@ -368,8 +371,8 @@ fn process_unit_enum(enum_name: Ident, data_enum: DataEnum) -> TokenStream {
                 }
 
                 impl<T> #variant_name <T> {
-                    /// The coordinate frame.
-                    const COORDINATE_FRAME: #enum_name = #enum_name :: #variant_name;
+                    /// The coordinate frame type.
+                    pub const COORDINATE_FRAME: #enum_name = #enum_name :: #variant_name;
 
                     #[doc = #new_doc]
                     pub const fn new(#first_component: T, #second_component: T, #third_component: T) -> Self {
@@ -459,6 +462,9 @@ fn process_unit_enum(enum_name: Ident, data_enum: DataEnum) -> TokenStream {
                     }
 
                     /// Returns the coordinate frame of this instance.
+                    ///
+                    /// This is the same as [`COORDINATE_FRAME`](Self::COORDINATE_FRAME), except
+                    /// that it is available as a function on an instance.
                     pub const fn coordinate_frame(&self) -> #enum_name {
                         Self::COORDINATE_FRAME
                     }

@@ -5,6 +5,12 @@ This project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
 
+### Added
+
+- The `COORDINATE_FRAME` constant is now public.
+- The documentation was improved with some visualizations about the coordinate system layouts.
+- The `coordinate_frame` is now available without the `CoordinateFrame` trait.
+
 ### Changed
 
 - The `x`, `y` and `z` functions of each type are now linked up with their respective directions

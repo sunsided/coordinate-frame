@@ -76,8 +76,16 @@ pub enum CoordinateFrameType {
     /// See [`EastSouthUp`].
     EastSouthUp = 11,
     /// See [`EastDownNorth`].
+    ///
+    /// ## Example usage
+    /// This is commonly a right-handed image-space reference frame with the origin in the top-left
+    /// corner and `z` pointing into the screen, away from the viewer.
     EastDownNorth = 12,
     /// See [`EastDownSouth`].
+    ///
+    /// ## Example usage
+    /// This is commonly a left-handed image-space reference frame with the origin in the top-left
+    /// corner and `z` pointing out of the screen, toward the viewer.
     EastDownSouth = 13,
     /// See [`EastUpNorth`].
     EastUpNorth = 14,

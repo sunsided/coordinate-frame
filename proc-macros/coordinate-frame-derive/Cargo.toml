@@ -23,4 +23,4 @@ defmt = []
 
 [dependencies]
 quote = "1.0.36"
-syn = "2.0.69"
+syn = "3.0.3"

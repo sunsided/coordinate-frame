@@ -5,6 +5,10 @@ This project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
 
+## [0.6.0] - 2026-11-15
+
+[0.6.0]: https://github.com/sunsided/coordinate-frame/releases/tag/v0.6.0
+
 ### Added
 
 - Added the `construct_frame` function to construct a coordinate frame from values and a `CoordinateFrameType` variant.

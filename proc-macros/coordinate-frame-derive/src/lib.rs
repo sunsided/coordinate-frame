@@ -1,8 +1,8 @@
 //! Provides the `CoordinateFrame` derive macro.
 
 use proc_macro::TokenStream;
-use quote::{format_ident, quote, ToTokens};
-use syn::{parse_macro_input, Data, DataEnum, DeriveInput, Fields, Ident, Lit};
+use quote::{ToTokens, format_ident, quote};
+use syn::{Data, DataEnum, DeriveInput, Fields, Ident, Lit, parse_macro_input};
 
 const LATERAL: [&str; 2] = ["east", "west"];
 const LONGITUDINAL: [&str; 2] = ["north", "south"];
@@ -161,7 +161,7 @@ fn process_unit_enum(enum_name: Ident, data_enum: DataEnum) -> TokenStream {
             let second_component = format_ident!("{}", &components[1]);
             let third_component = format_ident!("{}", &components[2]);
             let new_doc = format!("Creates a new [`{variant_name}`] instance from its _{}_, _{}_ and _{}_ components.",
-                &components[0], &components[1], &components[2]
+                components[0], components[1], components[2]
             );
 
             // Provide conversion to North, East, Down

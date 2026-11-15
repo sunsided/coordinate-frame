@@ -27,7 +27,7 @@ jobs:
         run: rustup toolchain install stable --profile minimal && rustup default stable
       - name: Verify tag matches crate version
         run: |
-          version="$(cargo pkgid -p coordinate-frame | sed 's/.*[#@]//')"
+          version="$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[] | select(.name == "coordinate-frame") | .version')"
           if [ "v${version}" != "${GITHUB_REF_NAME}" ]; then
             echo "::error::Tag ${GITHUB_REF_NAME} does not match crate version ${version}"
             exit 1

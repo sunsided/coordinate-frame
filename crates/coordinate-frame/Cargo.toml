@@ -29,3 +29,8 @@ num-traits = { version = "0.2.19", optional = true }
 [package.metadata.docs.rs]
 all-features = true
 rustdoc-args = ["--cfg", "docsrs"]
+
+[package.metadata.release]
+pre-release-replacements = [
+    { file = "../../CHANGELOG.md", search = "## Unreleased", replace = "## Unreleased\n\n## [{{version}}] - {{date}}\n\n[{{version}}]: https://github.com/sunsided/coordinate-frame/releases/tag/v{{version}}", exactly = 1 },
+]

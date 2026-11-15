@@ -24,3 +24,7 @@ defmt = []
 [dependencies]
 quote = "1.0.47"
 syn = "3.0.10"
+
+[package.metadata.release]
+# The workspace shares one version; only coordinate-frame carries the tag.
+tag = false

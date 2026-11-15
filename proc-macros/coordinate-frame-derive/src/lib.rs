@@ -1,7 +1,7 @@
 //! Provides the `CoordinateFrame` derive macro.
 
 use proc_macro::TokenStream;
-use quote::{ToTokens, format_ident, quote};
+use quote::{format_ident, quote};
 use syn::{Data, DataEnum, DeriveInput, Fields, Ident, Lit, parse_macro_input};
 
 const LATERAL: [&str; 2] = ["east", "west"];
@@ -194,7 +194,7 @@ fn process_unit_enum(enum_name: Ident, data_enum: DataEnum) -> TokenStream {
             let up = String::from("up");
             if variant_name != "EastNorthUp" && components.contains(&east) && components.contains(&north) && components.contains(&up) {
                 components_impl.push(quote! {
-                    /// Converts this type to an [`NorthEastDown`] instance.
+                    /// Converts this type to an [`EastNorthUp`] instance.
                     pub const fn to_enu(&self) -> EastNorthUp<T> where T: Copy {
                         let east = self.east();
                         let north = self.north();
@@ -247,6 +247,14 @@ fn process_unit_enum(enum_name: Ident, data_enum: DataEnum) -> TokenStream {
             // Handedness
             let right_handed = is_right_handed(&components[0], &components[1], &components[2]);
 
+            // The component formula yields the right-hand-rule result only in right-handed
+            // frames; swapping the operands negates it for left-handed frames.
+            let (cross_lhs, cross_rhs) = if right_handed {
+                (quote! { self }, quote! { rhs })
+            } else {
+                (quote! { rhs }, quote! { self })
+            };
+
             let mut handedness_impl = Vec::new();
             if right_handed {
                 handedness_impl.push(quote!{
@@ -257,12 +265,6 @@ fn process_unit_enum(enum_name: Ident, data_enum: DataEnum) -> TokenStream {
                     impl<T> LeftHanded for #variant_name <T> {}
                 });
             }
-
-            // Base vectors
-            // TODO: Remove, ambiguous
-            let x_axis_vec = axis_def_t(&components[0]);
-            let y_axis_vec = axis_def_t(&components[1]);
-            let z_axis_vec = axis_def_t(&components[2]);
 
             // Documentation for x, y and z.
             let x_doc = format!("For this type, this represents the [`{first_component}`](Self::{first_component}) direction.");
@@ -405,6 +407,10 @@ fn process_unit_enum(enum_name: Ident, data_enum: DataEnum) -> TokenStream {
                     ///
                     /// Be mindful not to directly pass a different coordinate frame into
                     /// this function unless you want to strictly re-interpret the values.
+                    ///
+                    /// ## Panics
+                    /// Panics if the slice does not have exactly three elements.
+                    /// Use [`TryFrom<&[T]>`](TryFrom) for a non-panicking alternative.
                     pub fn from_slice(vec: &[T]) -> Self
                     where
                         T: Clone
@@ -489,18 +495,18 @@ fn process_unit_enum(enum_name: Ident, data_enum: DataEnum) -> TokenStream {
                     }
 
                     /// Returns the base vector for the `x` axis in the local frame.
-                    pub fn x_axis() -> [T; 3] where T: ZeroOne<Output = T> + core::ops::Neg<Output = T> {
-                        #x_axis_vec
+                    pub fn x_axis() -> [T; 3] where T: ZeroOne<Output = T> {
+                        [T::one(), T::zero(), T::zero()]
                     }
 
                     /// Returns the base vector for the `y` axis in the local frame.
-                    pub fn y_axis() -> [T; 3] where T: ZeroOne<Output = T> + core::ops::Neg<Output = T> {
-                        #y_axis_vec
+                    pub fn y_axis() -> [T; 3] where T: ZeroOne<Output = T> {
+                        [T::zero(), T::one(), T::zero()]
                     }
 
                     /// Returns the base vector for the `z` axis in the local frame.
-                    pub fn z_axis() -> [T; 3] where T: ZeroOne<Output = T> + core::ops::Neg<Output = T> {
-                        #z_axis_vec
+                    pub fn z_axis() -> [T; 3] where T: ZeroOne<Output = T> {
+                        [T::zero(), T::zero(), T::one()]
                     }
 
                     /// Calculates the squared norm of the components.
@@ -508,21 +514,25 @@ fn process_unit_enum(enum_name: Ident, data_enum: DataEnum) -> TokenStream {
                     /// ## Panics
                     /// This operation may overflow.
                     pub fn norm_sq(&self) -> T where T: Clone + core::ops::Mul<T, Output = T> + core::ops::Add<T, Output = T> {
-                        let x = self.x().clone();
-                        let y = self.y().clone();
-                        let z = self.z().clone();
+                        let x = self.x();
+                        let y = self.y();
+                        let z = self.z();
                         x.clone() * x + y.clone() * y + z.clone() * z
                     }
 
                     /// Calculates the cross product (outer product) of two coordinates.
                     ///
+                    /// The result follows the right-hand rule in every frame, i.e. it describes the
+                    /// same physical direction regardless of the frame it is calculated in.
+                    ///
                     /// ## Panics
                     /// This operation may overflow.
                     pub fn cross(&self, rhs: &Self) -> Self where T: Clone + core::ops::Mul<T, Output = T> + core::ops::Sub<T, Output = T> {
+                        let (a, b) = (#cross_lhs, #cross_rhs);
                         Self([
-                            self[1].clone() * rhs[2].clone() - self[2].clone() * rhs[1].clone(),
-                            self[2].clone() * rhs[0].clone() - self[0].clone() * rhs[2].clone(),
-                            self[0].clone() * rhs[1].clone() - self[1].clone() * rhs[0].clone()
+                            a[1].clone() * b[2].clone() - a[2].clone() * b[1].clone(),
+                            a[2].clone() * b[0].clone() - a[0].clone() * b[2].clone(),
+                            a[0].clone() * b[1].clone() - a[1].clone() * b[0].clone()
                         ])
                     }
 
@@ -636,21 +646,21 @@ fn process_unit_enum(enum_name: Ident, data_enum: DataEnum) -> TokenStream {
                     /// Returns the base vector for the `x` axis.
                     #[inline]
                     #[must_use]
-                    fn x_axis() -> [Self::Type; 3] where Self::Type: ZeroOne<Output = Self::Type> + core::ops::Neg<Output = Self::Type> {
+                    fn x_axis() -> [Self::Type; 3] where Self::Type: ZeroOne<Output = Self::Type> {
                         Self::x_axis()
                     }
 
                     /// Returns the base vector for the `y` axis.
                     #[inline]
                     #[must_use]
-                    fn y_axis() -> [Self::Type; 3] where Self::Type: ZeroOne<Output = Self::Type> + core::ops::Neg<Output = Self::Type> {
+                    fn y_axis() -> [Self::Type; 3] where Self::Type: ZeroOne<Output = Self::Type> {
                         Self::y_axis()
                     }
 
                     /// Returns the base vector for the `z` axis.
                     #[inline]
                     #[must_use]
-                    fn z_axis() -> [Self::Type; 3] where Self::Type: ZeroOne<Output = Self::Type> + core::ops::Neg<Output = Self::Type> {
+                    fn z_axis() -> [Self::Type; 3] where Self::Type: ZeroOne<Output = Self::Type> {
                         Self::z_axis()
                     }
                 }
@@ -790,6 +800,16 @@ fn process_unit_enum(enum_name: Ident, data_enum: DataEnum) -> TokenStream {
                     fn from(value: #variant_name <i8>) -> micromath::vector::I8x3 {
                         let [x, y, z] = value.0;
                         Self { x, y, z }
+                    }
+                }
+
+                impl<T> core::convert::TryFrom<&[T]> for #variant_name <T> where T: Clone {
+                    type Error = core::array::TryFromSliceError;
+
+                    /// Constructs an instance from a slice of exactly three elements.
+                    fn try_from(value: &[T]) -> Result<Self, Self::Error> {
+                        let value: &[T; 3] = value.try_into()?;
+                        Ok(Self(value.clone()))
                     }
                 }
 
@@ -1061,7 +1081,7 @@ fn process_unit_enum(enum_name: Ident, data_enum: DataEnum) -> TokenStream {
         ///
         /// ## Returns
         /// This function generally returns `Some(frame)`. If unspecified coordinate systems
-        /// such as [`Other`](CoordianteFrameType::Other) or [`Undefined`](CoordianteFrameType::Undefined)
+        /// such as [`Other`](CoordinateFrameType::Other) or [`Undefined`](CoordinateFrameType::Undefined)
         /// are passed, the function returns `None`.
         pub fn construct_frame<T, Out>(system: CoordinateFrameType, x: T, y: T, z: T) -> Option<Out>
         where
@@ -1181,18 +1201,6 @@ fn axis_vec(axis: &str) -> [f32; 3] {
         "west" => [-1.0, 0.0, 0.0],
         "up" => [0.0, 0.0, 1.0],
         "down" => [0.0, 0.0, -1.0],
-        _ => unreachable!(),
-    }
-}
-
-fn axis_def_t(axis: &str) -> impl ToTokens {
-    match axis {
-        "north" => quote! { [T::zero(), T::one(), T::zero()] },
-        "south" => quote! { [T::zero(), T::one(), T::zero()] },
-        "east" => quote! { [T::one(), T::zero(), T::zero()] },
-        "west" => quote! { [T::one(), T::zero(), T::zero()] },
-        "up" => quote! { [T::zero(), T::zero(), T::one()] },
-        "down" => quote! { [T::zero(), T::zero(), T::one()] },
         _ => unreachable!(),
     }
 }

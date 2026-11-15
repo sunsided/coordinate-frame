@@ -57,20 +57,20 @@ pub trait CoordinateFrame {
     /// Indicates whether this coordinate system is right-handed or left-handed.
     fn right_handed(&self) -> bool;
 
-    /// Returns the base vector for the `x` axis in the global frame.
+    /// Returns the base vector for the `x` axis in the local frame.
     fn x_axis() -> [Self::Type; 3]
     where
-        Self::Type: ZeroOne<Output = Self::Type> + core::ops::Neg<Output = Self::Type>;
+        Self::Type: ZeroOne<Output = Self::Type>;
 
-    /// Returns the base vector for the `y` axis in the global frame.
+    /// Returns the base vector for the `y` axis in the local frame.
     fn y_axis() -> [Self::Type; 3]
     where
-        Self::Type: ZeroOne<Output = Self::Type> + core::ops::Neg<Output = Self::Type>;
+        Self::Type: ZeroOne<Output = Self::Type>;
 
-    /// Returns the base vector for the `z` axis in the global frame.
+    /// Returns the base vector for the `z` axis in the local frame.
     fn z_axis() -> [Self::Type; 3]
     where
-        Self::Type: ZeroOne<Output = Self::Type> + core::ops::Neg<Output = Self::Type>;
+        Self::Type: ZeroOne<Output = Self::Type>;
 }
 
 /// Marks a right-handed coordinate system.

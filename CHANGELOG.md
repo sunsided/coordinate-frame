@@ -14,6 +14,18 @@ This project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 - Migrated to Rust edition 2024; the MSRV is now 1.85.0.
 - Updated `defmt` to 1.x and `syn` to 3.x.
+- The `x_axis`, `y_axis` and `z_axis` functions no longer require `T: Neg`.
+
+### Fixed
+
+- The `x_axis`, `y_axis` and `z_axis` functions now return the unit vectors of the frame's own axes.
+  Previously, they returned unsigned axes of an East-North-Up frame, e.g. `[0, 1, 0]` for `NorthEastDown::x_axis()`.
+- `cross` now follows the right-hand rule in left-handed frames as well, so the result describes the same
+  physical vector regardless of the frame it was calculated in.
+
+### Added
+
+- Coordinate frames now implement `TryFrom<&[T]>` as a non-panicking alternative to `from_slice`.
 
 ## [0.5.0] - 2024-07-14
 

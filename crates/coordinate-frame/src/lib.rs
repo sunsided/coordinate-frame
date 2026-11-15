@@ -238,36 +238,113 @@ mod tests {
         assert_eq!(swu.0, [-1.0, -2.0, -3.0]);
     }
 
-    #[test]
-    #[cfg(feature = "std")]
-    fn test_permutations() {
-        const LATERAL: [&str; 2] = ["East", "West"];
-        const LONGITUDINAL: [&str; 2] = ["North", "South"];
-        const VERTICAL: [&str; 2] = ["Down", "Up"];
-        const MUTUALLY_EXCLUSIVE: [[&str; 2]; 3] = [LATERAL, LONGITUDINAL, VERTICAL];
-        const DIRECTIONS: [&str; 6] = ["North", "East", "South", "West", "Down", "Up"];
-        let mut permutations = Vec::new();
-        for x in DIRECTIONS.iter() {
-            'y: for y in DIRECTIONS.iter() {
-                for pair in MUTUALLY_EXCLUSIVE {
-                    if pair.contains(y) && pair.contains(x) {
-                        continue 'y;
-                    }
-                }
+    /// Checks the invariants of a single frame type and returns its encoding.
+    macro_rules! check_frame {
+        ($frame:ident) => {{
+            type F = $frame<f64>;
+            let frame = F::COORDINATE_FRAME;
 
-                let permutation = format!("{x}{y}");
-                'z: for z in DIRECTIONS.iter() {
-                    for pair in MUTUALLY_EXCLUSIVE {
-                        if pair.contains(z) && (pair.contains(x) || pair.contains(y)) {
-                            continue 'z;
-                        }
-                    }
-                    permutations.push(format!("{permutation}{z}"));
-                }
-            }
+            // Base vectors are unit vectors in the frame's own coordinates.
+            assert_eq!(F::x_axis(), [1.0, 0.0, 0.0], "{frame} x axis");
+            assert_eq!(F::y_axis(), [0.0, 1.0, 0.0], "{frame} y axis");
+            assert_eq!(F::z_axis(), [0.0, 0.0, 1.0], "{frame} z axis");
+
+            // Round trip through NED is lossless and agrees with `construct_frame`.
+            let value = F::new(1.0, 2.0, 3.0);
+            let ned = NorthEastDown::from(value);
+            assert_eq!(F::from(ned), value, "{frame} round trip");
+            assert_eq!(
+                NorthEastDown::new_from(frame, 1.0, 2.0, 3.0),
+                Some(ned),
+                "{frame} construct_frame"
+            );
+
+            // Handedness matches the physical orientation of the axes, measured in NED.
+            let axis = |a: [f64; 3]| NorthEastDown::from(F::from_array(a));
+            let orientation = axis(F::x_axis()).dot(&axis(F::y_axis()).cross(&axis(F::z_axis())));
+            let expected = if value.right_handed() { 1.0 } else { -1.0 };
+            assert_eq!(orientation, expected, "{frame} handedness");
+
+            // The cross product describes the same physical vector in every frame.
+            let a = NorthEastDown::new(1.0, 2.0, 3.0);
+            let b = NorthEastDown::new(-2.0, 0.5, 4.0);
+            let crossed = NorthEastDown::from(F::from(a).cross(&F::from(b)));
+            assert_eq!(crossed, a.cross(&b), "{frame} cross product");
+
+            u8::from(frame)
+        }};
+    }
+
+    #[test]
+    fn all_frames() {
+        macro_rules! check_all {
+            ($($frame:ident,)*) => { [$(check_frame!($frame)),*] };
         }
-        // let str = permutations.join(",");
-        assert_eq!(permutations.len(), 48);
+        let mut frames = check_all!(
+            NorthEastDown,
+            NorthEastUp,
+            NorthWestDown,
+            NorthWestUp,
+            NorthDownEast,
+            NorthDownWest,
+            NorthUpEast,
+            NorthUpWest,
+            EastNorthDown,
+            EastNorthUp,
+            EastSouthDown,
+            EastSouthUp,
+            EastDownNorth,
+            EastDownSouth,
+            EastUpNorth,
+            EastUpSouth,
+            SouthEastDown,
+            SouthEastUp,
+            SouthWestDown,
+            SouthWestUp,
+            SouthDownEast,
+            SouthDownWest,
+            SouthUpEast,
+            SouthUpWest,
+            WestNorthDown,
+            WestNorthUp,
+            WestSouthDown,
+            WestSouthUp,
+            WestDownNorth,
+            WestDownSouth,
+            WestUpNorth,
+            WestUpSouth,
+            DownNorthEast,
+            DownNorthWest,
+            DownEastNorth,
+            DownEastSouth,
+            DownSouthEast,
+            DownSouthWest,
+            DownWestNorth,
+            DownWestSouth,
+            UpNorthEast,
+            UpNorthWest,
+            UpEastNorth,
+            UpEastSouth,
+            UpSouthEast,
+            UpSouthWest,
+            UpWestNorth,
+            UpWestSouth,
+        );
+        frames.sort_unstable();
+        for (expected, frame) in frames.into_iter().enumerate() {
+            assert_eq!(
+                usize::from(frame),
+                expected,
+                "every variant is covered exactly once"
+            );
+        }
+    }
+
+    #[test]
+    fn try_from_slice() {
+        let ned = NorthEastDown::try_from(&[1.0, 2.0, 3.0][..]).expect("length 3");
+        assert_eq!(ned, &[1.0, 2.0, 3.0]);
+        assert!(NorthEastDown::<f64>::try_from(&[1.0, 2.0][..]).is_err());
     }
 
     #[test]

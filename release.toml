@@ -1,0 +1,10 @@
+# cargo-release configuration; crates.io publishing happens in
+# .github/workflows/release.yml (trusted publishing) when the tag is pushed.
+allow-branch = ["main"]
+shared-version = true
+consolidate-commits = true
+tag-name = "v{{version}}"
+publish = false
+push = true
+pre-release-commit-message = "Release version {{version}}"
+tag-message = "Release version {{version}}"

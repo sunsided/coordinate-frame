@@ -1,0 +1,61 @@
+# https://taskfile.dev
+version: '3'
+
+vars:
+  MSRV: 1.85.0
+
+tasks:
+  default:
+    cmds:
+      - task --list
+    silent: true
+
+  fmt:
+    desc: Format the code
+    cmds:
+      - cargo fmt --all
+
+  lint:
+    desc: Check formatting, run clippy and codespell
+    cmds:
+      - cargo fmt --all --check
+      - cargo clippy --workspace --all-features --all-targets -- -D warnings
+      - codespell
+
+  test:
+    desc: Run tests for all feature combinations
+    cmds:
+      - for: ['', '--all-features', '--no-default-features']
+        cmd: cargo test --workspace {{.ITEM}}
+
+  doc:
+    desc: Build the documentation
+    env:
+      RUSTDOCFLAGS: -D warnings
+    cmds:
+      - cargo doc --all-features --no-deps
+
+  msrv:
+    desc: Check the build against the MSRV ({{.MSRV}})
+    cmds:
+      - cargo +{{.MSRV}} check --workspace --all-targets --all-features
+
+  actions:
+    desc: Lint the GitHub Actions workflows
+    cmds:
+      - actionlint
+      - zizmor .
+
+  ci:
+    desc: Run all checks
+    cmds:
+      - task: lint
+      - task: test
+      - task: doc
+      - task: msrv
+      - task: actions
+
+  release:
+    desc: 'Cut a release, e.g. `task release -- minor` (dry run unless `--execute` is passed)'
+    cmds:
+      - cargo release --workspace {{.CLI_ARGS}}

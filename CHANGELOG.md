@@ -10,6 +10,11 @@ This project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Added the `construct_frame` function to construct a coordinate frame from values and a `CoordinateFrameType` variant.
 - Added the `new_from` function to a coordinate frame to simplify access to `construct_frame`.
 
+### Changed
+
+- Migrated to Rust edition 2024; the MSRV is now 1.85.0.
+- Updated `defmt` to 1.x and `syn` to 3.x.
+
 ## [0.5.0] - 2024-07-14
 
 [0.5.0]: https://github.com/sunsided/coordinate-frame/releases/tag/v0.5.0

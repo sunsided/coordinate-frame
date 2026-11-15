@@ -331,13 +331,18 @@ mod tests {
             UpWestSouth,
         );
         frames.sort_unstable();
-        for (expected, frame) in frames.into_iter().enumerate() {
-            assert_eq!(
-                usize::from(frame),
-                expected,
-                "every variant is covered exactly once"
-            );
-        }
+        let expected = (0..=u8::MAX).filter(|&value| {
+            CoordinateFrameType::try_from(value).is_ok_and(|frame| {
+                !matches!(
+                    frame,
+                    CoordinateFrameType::Other | CoordinateFrameType::Undefined
+                )
+            })
+        });
+        assert!(
+            frames.iter().copied().eq(expected),
+            "every frame variant is covered exactly once"
+        );
     }
 
     #[test]

@@ -522,8 +522,10 @@ fn process_unit_enum(enum_name: Ident, data_enum: DataEnum) -> TokenStream {
 
                     /// Calculates the cross product (outer product) of two coordinates.
                     ///
-                    /// The result follows the right-hand rule in every frame, i.e. it describes the
-                    /// same physical direction regardless of the frame it is calculated in.
+                    /// Returns the physical (right-handed) cross product expressed in this frame, i.e.
+                    /// the result describes the same physical direction regardless of the frame it is
+                    /// calculated in. In left-handed frames this is the negation of the component-wise
+                    /// formula applied to the frame's own coordinates.
                     ///
                     /// ## Panics
                     /// This operation may overflow.

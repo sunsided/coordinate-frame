@@ -9,11 +9,21 @@ This project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 - Added the `construct_frame` function to construct a coordinate frame from values and a `CoordinateFrameType` variant.
 - Added the `new_from` function to a coordinate frame to simplify access to `construct_frame`.
+- Coordinate frames now implement `TryFrom<&[T]>` as a non-panicking alternative to `from_slice`.
 
 ### Changed
 
 - Migrated to Rust edition 2024; the MSRV is now 1.85.0.
 - Updated `defmt` to 1.x and `syn` to 3.x.
+- The `x_axis`, `y_axis` and `z_axis` functions no longer require `T: Neg`.
+
+### Fixed
+
+- The `x_axis`, `y_axis` and `z_axis` functions now return the unit vectors of the frame's own axes.
+  Previously, they returned unsigned axes of an East-North-Up frame, e.g. `[0, 1, 0]` for `NorthEastDown::x_axis()`.
+- `cross` now returns the physical (right-handed) cross product in left-handed frames as well, so the result
+  describes the same physical vector regardless of the frame it was calculated in. In left-handed frames this
+  is the negation of the component-wise formula.
 
 ## [0.5.0] - 2024-07-14
 
